@@ -105,16 +105,16 @@ ContentModelViewer.setup.defineFunctions = function() {
   var properties = ContentModelViewer.properties;
   var url = properties.url;
   ContentModelViewer.functions = {
-    /*
- *so we can add the autocomplet.js
- */
-addAutoCompleteJavascript: function(){
-    var th = document.getElementsByTagName('head')[0];
-    var s = document.createElement('script');
-    s.setAttribute('type','text/javascript');
-    s.setAttribute( 'src', '/misc/autocomplete.js');
-    th.appendChild(s);
-},
+    /**
+     * So we can add the autocomplete.js
+     */
+    addAutoCompleteJavascript: function(){
+      var th = document.getElementsByTagName('head')[0];
+      var s = document.createElement('script');
+      s.setAttribute('type','text/javascript');
+      s.setAttribute( 'src', '/misc/autocomplete.js');
+      th.appendChild(s);
+    },
     /**
      * Download Datastream using hidden html form that is rendered with the Viewer.tpl.php
      */
@@ -145,7 +145,7 @@ addAutoCompleteJavascript: function(){
             itemId: 'resource-overview',
             pid: pid
           }));
-           resourceOverview = tabpanel.getComponent('resource-overview');// pp added this
+          resourceOverview = tabpanel.getComponent('resource-overview');// pp added this
         }
         else {
           resourceOverview.setPid(pid);
@@ -323,7 +323,7 @@ ContentModelViewer.setup.createStores = function() {
     model: models.FedoraObject,
     autoLoad: true,
     autoSync: true,
-    pageSize: 5,
+    pageSize: 30,
     remoteSort: true,
     remoteFilter: true,
     sorters: [{
