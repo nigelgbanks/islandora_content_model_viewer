@@ -65,10 +65,7 @@
 }
 
 .member-item {
-  padding-top: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-  height: 136px;
+  padding: 2px 5px;
 }
 
 .x-dataview-item > .member-item {

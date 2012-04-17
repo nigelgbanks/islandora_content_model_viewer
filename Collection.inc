@@ -470,12 +470,15 @@ class Collection {
     $default_description = 'Default Description, Check this object\'s metadata and ensure a description is present.';
     $item = new Fedora_Item($pid);
     $dc = $item->get_datastream_dissemination('DC');
-    $document = new DOMDocument();
-    $document->loadXML($dc);
-    $xpath = new DOMXPath($document);
-    $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
-    $results = $xpath->query('//dc:description');
-    $count = $results->length;
+    $count = 0;
+    if (isset($dc)) {
+      $document = new DOMDocument();
+      $document->loadXML($dc);
+      $xpath = new DOMXPath($document);
+      $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+      $results = $xpath->query('//dc:description');
+      $count = $results->length;
+    }
     if ($count > 0) {
       $description = '';
       for ($i = 0; $i < $count; $i++) {
