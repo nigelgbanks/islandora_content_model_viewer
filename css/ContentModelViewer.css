@@ -66,6 +66,19 @@
 
 .member-item {
   padding: 2px 5px; 
+  height: 36px;
+}
+
+.member-item.odd {
+  background-color: #FFFFFF;
+}
+
+.member-item.even {
+  background-color: #EEEEEE;
+}
+
+.member-item.unedited {
+  background-color: #FFBF00;
 }
 
 .x-dataview-item > .member-item {
@@ -86,6 +99,7 @@
   white-space: nowrap; 
   text-overflow: ellipsis; 
   overflow: hidden; 
+  padding-left: 2px;
 }
 
 .member-item-description {
@@ -96,8 +110,8 @@
 .member-item-img {
   margin-left: auto;
   margin-right: auto;
-  height: 64px;
-  width: 64px;
+  height: 32px;
+  width: 32px;
   display: block;
 }
 /*

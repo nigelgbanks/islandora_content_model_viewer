@@ -98,9 +98,9 @@ Ext.onReady(function(){
             text: 'Add resources',
             handler: function(button, event) {
               var form = Ext.get("datastream-edit-form");
-			  var tempUrl = window.location.toString();
-			  var index = tempUrl.indexOf('/fedora/repository');
-			  tempUrl = tempUrl.substr(0,index)+'/fedora/repository/'+ContentModelViewer.properties.pids.focused;
+              var tempUrl = window.location.toString();
+              var index = tempUrl.indexOf('/fedora/repository');
+              tempUrl = tempUrl.substr(0,index)+'/fedora/repository/'+ContentModelViewer.properties.pids.focused;
               form.set({
                 action: tempUrl //window.location // Same Spot.
               });
@@ -132,7 +132,10 @@ Ext.onReady(function(){
         deferEmptyText: false,
         itemTpl: new Ext.XTemplate(
         '<tpl for=".">',
-        ' <div class="member-item">',
+        ' <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]}">', //{[originalMetadata ? "unedited" : "edited"]}
+        '  <span style="float:left;text-align:center">',
+        '   <img class="member-item-img" src="{tn}"></img>',
+        '  </span>',
         '  <div class="member-item-label">{label}</div>',
         ' </div>',
         '</tpl>',

@@ -59,7 +59,7 @@ Ext.onReady(function(){
   // Create container for Application
   ContentModelViewer.container =  Ext.create('Ext.container.Container', {
     renderTo: 'content-model-viewer',
-    height: 800,
+    height: 832,
     width: 920,
     frame: true,
     defaults: {
@@ -73,7 +73,7 @@ Ext.onReady(function(){
       region: 'center',
       id: 'cmvtabpanel',
       width: 760,
-      height: 800,
+      height: 832,
       items: tabs,
       listeners: {
         afterrender: function(){

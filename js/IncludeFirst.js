@@ -218,6 +218,9 @@ ContentModelViewer.setup.defineModels = function() {
     }, {
       name: 'isCollection',
       type: 'boolean'
+    },{
+      name: 'originalMetadata',
+      type: 'boolean'
     }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
@@ -323,7 +326,7 @@ ContentModelViewer.setup.createStores = function() {
     model: models.FedoraObject,
     autoLoad: true,
     autoSync: true,
-    pageSize: 30,
+    pageSize: 20,
     remoteSort: true,
     remoteFilter: true,
     sorters: [{
