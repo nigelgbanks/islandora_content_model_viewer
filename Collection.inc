@@ -510,7 +510,7 @@ class Collection {
       $dc = $item->get_datastream_dissemination('DC');
       if (isset($dc)) {
         $document = new DOMDocument();
-        $document->loadXML($rels);
+        $document->loadXML($dc);
         $xpath = new DOMXPath($document);
         $results = $xpath->query('//*[local-name() = "type"]');
         $length = $results->length;
