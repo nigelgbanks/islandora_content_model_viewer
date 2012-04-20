@@ -446,32 +446,13 @@ class Collection {
     global $base_url;
     foreach ($results as &$result) {
       $pid = $result['pid'];
-      $type = NULL;
+      $type = $this->getType($pid);
       if ($show_type) {
-        $types = array(
-          'Collection' => 'Collection',
-          'DataSet' => 'Data Set',
-          'Service' => 'Service',
-          'Software' => 'Software',
-          'Image' => 'Image',
-          'InteractiveResource' => 'Interactive Resource',
-          'MovingImage' => 'Video',
-          'PhysicalObject' => 'Physical Object',
-          'Sound' => 'Audio',
-          'StillImage' => 'Image',
-          'Text' => 'Text',
-        );
-        $type = $this->getType($pid);
-        $type = (array_key_exists($type, $types) !== FALSE) ? $types[$type] : 'Text';
-      }
-      if (isset($type)) {
         $result['label'] = "{$type}: {$result['label']}";
       }
       $result['originalMetadata'] = $this->isMetadataOriginal($pid);
       $result['link'] = "$base_url/fedora/repository/$pid";
-      $result['tn'] = $this->getThumbnail($pid, $result['type']); //$image_path . '/object.png';
-      //
-      //$result['isCollection'] = self::isModelCollection($result['model']);
+      $result['tn'] = $this->getThumbnail($pid, $result['type']);
     }
     return $results;
   }
@@ -512,23 +493,39 @@ class Collection {
   private function getType($pid) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $item = new Fedora_Item($pid);
-    if (isset($item->datastreams['RELS-EXT'])) {
-      $rels = $item->get_datastream_dissemination('RELS-EXT');
-      if (isset($rels)) {
+    if (isset($item->datastreams['DC'])) {
+      $types = array(
+        'Collection' => 'Collection',
+        'DataSet' => 'Data Set',
+        'Service' => 'Service',
+        'Software' => 'Software',
+        'Image' => 'Image',
+        'InteractiveResource' => 'Interactive Resource',
+        'MovingImage' => 'Video',
+        'PhysicalObject' => 'Physical Object',
+        'Sound' => 'Audio',
+        'StillImage' => 'Image',
+        'Text' => 'Text',
+      );
+      $dc = $item->get_datastream_dissemination('DC');
+      if (isset($dc)) {
         $document = new DOMDocument();
         $document->loadXML($rels);
         $xpath = new DOMXPath($document);
-        $results = $xpath->query('//*[local-name() = "orginal_metadata"]');
+        $results = $xpath->query('//*[local-name() = "type"]');
         $length = $results->length;
-        if ($length > 1) {
-          $node = $results->item(0);
-          return trim($node->value) == 'TRUE' ? true : false;
+        for ($i = 0; $i < $length; $i++) {
+          $node = $results->item($i);
+          $type = trim($node->value);
+          if (array_key_exists($type, $types)) {
+            return $types[$type];
+          }
         }
       }
     }
-    return FALSE;
+    return 'Text';
   }
-  
+
   /**
    *
    * @param type $type
