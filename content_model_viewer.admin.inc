@@ -241,7 +241,6 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
  */
 function content_model_viewer_datastream_default_rules_form_submit(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#model_id'])) {
-    error_log("if");
     $model_id = $form_state['clicked_button']['#model_id'];
     $values = $form_state['values'];
     $update = array(
@@ -251,7 +250,7 @@ function content_model_viewer_datastream_default_rules_form_submit(array $form, 
     );
     foreach ($update as $properties) {
       list($column, $type, $value) = $properties;
-      error_log("query");
+      dsm(debug_backtrace());
       db_query("UPDATE {%s} SET %s = '$type' where id = '%d'", CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $model_id);
     }
   }
