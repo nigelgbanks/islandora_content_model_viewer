@@ -453,6 +453,7 @@ class Collection {
       }
       $result['tn'] = $this->getThumbnail($pid, $type);
       $result['link'] = "$base_url/fedora/repository/$pid";
+      $result['isCollection'] = self::isModelCollection($result['model']);
     }
     return $results;
   }
