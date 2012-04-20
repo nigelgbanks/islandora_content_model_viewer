@@ -250,7 +250,6 @@ function content_model_viewer_datastream_default_rules_form_submit(array $form, 
     );
     foreach ($update as $properties) {
       list($column, $type, $value) = $properties;
-      dsm(debug_backtrace());
       db_query("UPDATE {%s} SET %s = '$type' where id = '%d'", CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $model_id);
     }
   }
