@@ -449,10 +449,10 @@ class Collection {
       $type = $this->getType($pid);
       if ($show_type) {
         $result['label'] = "{$type}: {$result['label']}";
+        $result['originalMetadata'] = $this->isMetadataOriginal($pid);
       }
-      $result['originalMetadata'] = $this->isMetadataOriginal($pid);
+      $result['tn'] = $this->getThumbnail($pid, $type);
       $result['link'] = "$base_url/fedora/repository/$pid";
-      $result['tn'] = $this->getThumbnail($pid, $result['type']);
     }
     return $results;
   }
@@ -516,7 +516,7 @@ class Collection {
         $length = $results->length;
         for ($i = 0; $i < $length; $i++) {
           $node = $results->item($i);
-          $type = trim($node->value);
+          $type = trim($node->textContent);
           if (array_key_exists($type, $types)) {
             return $types[$type];
           }
@@ -542,9 +542,10 @@ class Collection {
         $xpath = new DOMXPath($document);
         $results = $xpath->query('//*[local-name() = "orginal_metadata"]');
         $length = $results->length;
-        if ($length > 1) {
+        if ($length >= 1) {
           $node = $results->item(0);
-          return trim($node->value) == 'TRUE' ? true : false;
+          $value = trim($node->textContent);
+          return $value == 'TRUE' ? TRUE : TRUE;
         }
       }
     }

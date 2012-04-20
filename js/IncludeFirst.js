@@ -220,7 +220,8 @@ ContentModelViewer.setup.defineModels = function() {
       type: 'boolean'
     },{
       name: 'originalMetadata',
-      type: 'boolean'
+      type: 'boolean',
+      defaultValue: false 
     }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
