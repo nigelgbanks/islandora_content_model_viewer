@@ -118,7 +118,7 @@ class Collection {
     $results = $this->filter($results, $filter);
     $results = $this->sort($results, $sort);
     list($results, $count) = $this->limit($results, $offset, $limit);
-    $results = $this->populate($results);
+    $results = $this->populate($results, TRUE);
     return array($results, $count);
   }
 
@@ -201,9 +201,8 @@ class Collection {
    * @return array
    */
   private function findMembers() {
-    $query = 'select $object $title $type $model $parent_model $created from <#ri>
+    $query = 'select $object $title $model $parent_model $created from <#ri>
                         where ($object <info:fedora/fedora-system:def/model#label> $title
-                        and $object <http://purl.org/dc/elements/1.1/type> $type
                         and $object <fedora-model:hasModel> $model
                         and $model <fedora-model:hasModel> $parent_model
                         and $parent_model <mulgara:is> <info:fedora/islandora:resourceCModel>
@@ -236,7 +235,7 @@ class Collection {
    * 
    * @return array
    */
-  private function query($query, $show_type = FALSE) {
+  private function query($query) {
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
     $collection = new CollectionClass();
     $results = $collection->getRelatedObjects($this->pid, 1000000, NULL, $query);
@@ -248,7 +247,7 @@ class Collection {
       $path->registerNamespace('sparql', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
       $results = $path->query('//sparql:result');
       $num_results = $results->length;
-      return ($num_results > 0) ? $this->processQueryResults($results, $path, $show_type) : array();
+      return ($num_results > 0) ? $this->processQueryResults($results, $path) : array();
     }
     return array();
   }
@@ -260,11 +259,11 @@ class Collection {
    * 
    * @return array
    */
-  private function processQueryResults(DOMNodeList $results, DOMXPath $path, $show_type) {
+  private function processQueryResults(DOMNodeList $results, DOMXPath $path) {
     $ret = array();
     $count = $results->length;
     for ($i = 0; $i < $count; $i++) {
-      $ret[] = $this->processQueryResult($results->item($i), $path, $show_type);
+      $ret[] = $this->processQueryResult($results->item($i), $path);
     }
     return $ret;
   }
@@ -278,33 +277,15 @@ class Collection {
    * @return array
    *   Basic properties of the object/query result.
    */
-  private function processQueryResult(DOMNode $result, DOMXPath $path, $show_type) {
+  private function processQueryResult(DOMNode $result, DOMXPath $path) {
     $pid = $this->getQueryResultValue('sparql:object/@uri', $result, $path);
     $pid = substr($pid, self::MODEL_PREFIX_LENGTH);
     $label = $this->getQueryResultValue('sparql:title', $result, $path);
-    $type = NULL;
-    if ($show_type) {
-      $types = array(
-        'Collection' => 'Collection',
-        'DataSet' => 'Data Set',
-        'Service' => 'Service',
-        'Software' => 'Software',
-        'Image' => 'Image',
-        'InteractiveResource' => 'Interactive Resource',
-        'MovingImage' => 'Video',
-        'PhysicalObject' => 'Physical Object',
-        'Sound' => 'Audio',
-        'StillImage' => 'Image',
-        'Text' => 'Text',
-      );
-      $type = $this->getQueryResultValue('sparql:type', $result, $path);
-      $type = (array_key_exists($type, $types) !== FALSE) ? $types[$type] : 'Text';
-    }
     $created = $this->getQueryResultValue('sparql:created', $result, $path);
     $relatedCount = $this->getQueryResultValue('sparql:k0', $result, $path);
     $model = $this->getQueryResultValue('sparql:model/@uri', $result, $path);
     $model = substr($model, self::MODEL_PREFIX_LENGTH);
-    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model, 'type' => $type);
+    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model);
   }
 
   /**
@@ -461,16 +442,35 @@ class Collection {
    * 
    * @return array
    */
-  private function populate($results) {
+  private function populate($results, $show_type = FALSE) {
     global $base_url;
     foreach ($results as &$result) {
       $pid = $result['pid'];
-      if (isset($result['type'])) {
-        $result['label'] = "{$result['type']}: {$result['label']}";
+      $type = NULL;
+      if ($show_type) {
+        $types = array(
+          'Collection' => 'Collection',
+          'DataSet' => 'Data Set',
+          'Service' => 'Service',
+          'Software' => 'Software',
+          'Image' => 'Image',
+          'InteractiveResource' => 'Interactive Resource',
+          'MovingImage' => 'Video',
+          'PhysicalObject' => 'Physical Object',
+          'Sound' => 'Audio',
+          'StillImage' => 'Image',
+          'Text' => 'Text',
+        );
+        $type = $this->getType($pid);
+        $type = (array_key_exists($type, $types) !== FALSE) ? $types[$type] : 'Text';
+      }
+      if (isset($type)) {
+        $result['label'] = "{$type}: {$result['label']}";
       }
       $result['originalMetadata'] = $this->isMetadataOriginal($pid);
       $result['link'] = "$base_url/fedora/repository/$pid";
       $result['tn'] = $this->getThumbnail($pid, $result['type']); //$image_path . '/object.png';
+      //
       //$result['isCollection'] = self::isModelCollection($result['model']);
     }
     return $results;
@@ -506,6 +506,31 @@ class Collection {
 
   /**
    *
+   * @param type $pid
+   * @return type 
+   */
+  private function getType($pid) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $item = new Fedora_Item($pid);
+    if (isset($item->datastreams['RELS-EXT'])) {
+      $rels = $item->get_datastream_dissemination('RELS-EXT');
+      if (isset($rels)) {
+        $document = new DOMDocument();
+        $document->loadXML($rels);
+        $xpath = new DOMXPath($document);
+        $results = $xpath->query('//*[local-name() = "orginal_metadata"]');
+        $length = $results->length;
+        if ($length > 1) {
+          $node = $results->item(0);
+          return trim($node->value) == 'TRUE' ? true : false;
+        }
+      }
+    }
+    return FALSE;
+  }
+  
+  /**
+   *
    * @param type $type
    * @param type $pid 
    */
@@ -518,7 +543,7 @@ class Collection {
         $document = new DOMDocument();
         $document->loadXML($rels);
         $xpath = new DOMXPath($document);
-        $results = $xpath->query('//*[local-name() = "orginal_metadata"]'); // http://islandora.org/ontologies/metadata#orginal_metadata
+        $results = $xpath->query('//*[local-name() = "orginal_metadata"]');
         $length = $results->length;
         if ($length > 1) {
           $node = $results->item(0);
