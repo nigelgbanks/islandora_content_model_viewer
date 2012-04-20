@@ -153,7 +153,7 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
   $model_id = content_model_viewer_get_model_id($pid);
   $row = new stdClass();
   $row->model_id = $model_id; // @todo incorporate this into its own function, so external modules can install defaults...
-  $hidden = array('^POLICY$', '^DC$', '^RELS-EXT$', '^RELS-INT$', '^ISLANDORACM$');
+  $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM');
   foreach ($hidden as $hide) {
     $row->dsid = $hide;
     $row->view = $row->download = 0;
@@ -241,6 +241,7 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
  */
 function content_model_viewer_datastream_default_rules_form_submit(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#model_id'])) {
+    error_log("if");
     $model_id = $form_state['clicked_button']['#model_id'];
     $values = $form_state['values'];
     $update = array(
@@ -250,6 +251,7 @@ function content_model_viewer_datastream_default_rules_form_submit(array $form, 
     );
     foreach ($update as $properties) {
       list($column, $type, $value) = $properties;
+      error_log("query");
       db_query("UPDATE {%s} SET %s = '$type' where id = '%d'", CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $model_id);
     }
   }
