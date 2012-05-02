@@ -352,6 +352,7 @@ ContentModelViewer.setup.createStores = function() {
    */
   Ext.create('Ext.data.TreeStore', {
     storeId:'treemembers',
+    folderSort: false,
     model: models.treemembers,
     sorters: [{
       property: 'leaf',
