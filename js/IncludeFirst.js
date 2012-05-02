@@ -355,9 +355,6 @@ ContentModelViewer.setup.createStores = function() {
     folderSort: false,
     model: models.treemembers,
     sorters: [{
-      property: 'leaf',
-      direction: 'ASC'
-    },{
       property: 'text',
       direction: 'ASC'
     }]
