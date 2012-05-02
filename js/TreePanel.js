@@ -2,6 +2,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   extend: 'Ext.tree.Panel',
 viewConfig : {selectedItemCls : "even"},
   region: 'west',
+  folderSort: false,
   store:'treemembers',
   autoLoad: false,
   root: 'data',
