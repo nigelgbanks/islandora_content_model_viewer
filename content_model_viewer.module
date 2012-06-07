@@ -127,8 +127,8 @@ function content_model_viewer_menu() {
 
 /**
  * Implements hook_menu_alter().
- * 
- * @param array $items 
+ *
+ * @param array $items
  */
 function content_model_viewer_menu_alter(&$items) {
   $items['fedora']['page callback'] = 'content_model_viewer';
@@ -190,8 +190,8 @@ function content_model_viewer_theme() {
 }
 
 /**
- * 'content_model_datastream_viewers' Hook implementation. 
- * 
+ * 'content_model_datastream_viewers' Hook implementation.
+ *
  * Lists all the datastream viewers
  */
 function content_model_viewer_content_model_datastream_viewers() {
@@ -287,7 +287,7 @@ function content_model_viewer_include_viewers() {
 
 /**
  * Hook for register_content_models_for_viewer
- * 
+ *
  * @return array
  */
 function content_model_viewer_register_content_models_for_viewer() {
@@ -303,9 +303,9 @@ function content_model_viewer_register_content_models_for_viewer() {
 
 /**
  * Gets an instance of a content model viewer.
- * 
+ *
  * @param string $pid
- * 
+ *
  * @return object
  *   An instance of the Content Model Viewer if found. Otherwise it returns
  *   the default content model viewer.
@@ -327,9 +327,9 @@ function content_model_viewer_get_registered_content_model_viewer($pid) {
 
 /**
  * Get the pid of this objects content model.
- * 
+ *
  * @param string $pid
- * 
+ *
  * @return string
  */
 function content_model_viewer_get_content_model_pid($pid) {
@@ -340,7 +340,7 @@ function content_model_viewer_get_content_model_pid($pid) {
 
 /**
  * Gets the Supported Viewers.
- * 
+ *
  * @staticvar array $cache
  * @return array
  */
@@ -360,12 +360,12 @@ function content_model_viewer_get_supported_viewers() {
 
 /**
  * Looks for a supported viewer that can view the given MIME type, and gets the viewer properties.
- * 
- * @param string $mime 
+ *
+ * @param string $mime
  *   A valid MIME Type.
  *
  * @return array
- *   The properties of the viewer if found, NULL otherwise. The format of the properties is defined by the 
+ *   The properties of the viewer if found, NULL otherwise. The format of the properties is defined by the
  *   content_model_datastream_viewers hook.
  */
 function content_model_viewer_get_viewer_properties($mime) {
@@ -380,7 +380,7 @@ function content_model_viewer_get_viewer_properties($mime) {
 
 /**
  * Sets up variables for the template.
- * 
+ *
  * @param array $variables
  */
 function template_preprocess_content_model_viewer(array &$variables) {
@@ -494,9 +494,9 @@ function content_model_viewer($pid = NULL) {
 
 /**
  * Returns the HTML for overview panel in the viewer.
- * 
- * @param string $pid 
- * 
+ *
+ * @param string $pid
+ *
  * @return string
  */
 function content_model_viewer_overview($pid) {
@@ -519,8 +519,8 @@ function content_model_viewer_overview($pid) {
 
 /**
  * Gets the members of this collection.
- * 
- * @param string $pid 
+ *
+ * @param string $pid
  */
 function content_model_viewer_members($pid) {
   module_load_include('inc', 'content_model_viewer', 'Collection');
@@ -530,7 +530,7 @@ function content_model_viewer_members($pid) {
   exit();
   /**
    * Expected Data:
-   * 
+   *
    * 'link' => $base_url . '/viewer/' . 'coccc:1675',
    * 'label' => 'Some Colorado College Object',
    * 'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
@@ -543,8 +543,8 @@ function content_model_viewer_members($pid) {
 
 /**
  * Generate JSON to pass to EXT.js tree panel based on PID.
- * 
- * @param string $pid 
+ *
+ * @param string $pid
  *   The PID of the Fedora Object
  */
 function content_model_viewer_treemembers($pid) {
@@ -557,8 +557,8 @@ function content_model_viewer_treemembers($pid) {
 
 /**
  * Get/Set data stream properties for the given Fedora Object.
- * 
- * @param string $pid 
+ *
+ * @param string $pid
  *   The PID of the Fedora Object, whose data streams this function will get/set.s
  */
 function content_model_viewer_datastreams($pid, $dsid = NULL) {
@@ -588,7 +588,7 @@ function content_model_viewer_datastreams($pid, $dsid = NULL) {
  * Gets/sets the properties of the object identified by $pid.
  *
  * @param string $pid
- * 
+ *
  * @return string
  */
 function content_model_viewer_properties($pid) {
@@ -602,9 +602,8 @@ function content_model_viewer_properties($pid) {
     case 'POST':
       $label = $_POST['label'];
       $owner = $_POST['owner'];
-      $state = $_POST['state'];
       $object_properties = new ObjectProperties($pid);
-      $success = $object_properties->setProperties($label, $owner, $state);
+      $success = $object_properties->setProperties($label, $owner);
       $message = $success ? t('Successfuly modified object properties') : t('Failed to modify object properties');
       $properties = $object_properties->getProperties();
       echo json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
@@ -617,15 +616,25 @@ function content_model_viewer_properties($pid) {
  *
  * The user will be redirected to the sites home page.
  *
- * @param string $pid 
+ * @param string $pid
  *
  * @return string
  */
 function content_model_viewer_purge_object($pid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $item = new Fedora_Item($pid);
-  $success = $item->purge();
-  $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
+  module_load_include('inc', 'content_model_viewer', 'ObjectProperties');
+  $active_states = array('A', 'I');
+  $properties = new ObjectProperties($pid);
+  $state = $properties->state;
+  if (array_search($state, $active_states) !== FALSE) {
+    // @todo check for children
+    $success = $properties->setState('D');
+    $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
+  }
+  else {
+    $success = FALSE;
+    $message = t('Object does not exist or is in a in-active state.');
+  }
   echo json_encode(array('success' => $success, 'msg' => $message));
   exit();
 }
@@ -633,7 +642,7 @@ function content_model_viewer_purge_object($pid) {
 /**
  * Adds a datastream to the object identified by $pid.*
  *
- * @param string $pid 
+ * @param string $pid
  *
  * @return string
  */
@@ -666,7 +675,7 @@ function content_model_viewer_add_datastream($pid) {
 /**
  * Purges the given datastream ($dsid) from the object identified by $pid.
  *
- * @param string $pid 
+ * @param string $pid
  * @param string $dsid
  *
  * @return string
@@ -683,7 +692,7 @@ function content_model_viewer_purge_datastream($pid, $dsid) {
 /**
  * Downloads the given datastream ($dsid) from the object identified by $pid.
  *
- * @param string $pid 
+ * @param string $pid
  * @param string $dsid
  *
  * @return string
@@ -696,7 +705,7 @@ function content_model_viewer_download_datastream($pid, $dsid) {
 /**
  * Renders the viewer for the given datastream ($dsid) from the object identified by $pid.
  *
- * @param string $pid 
+ * @param string $pid
  * @param string $dsid
  *
  * @return string
@@ -721,9 +730,9 @@ function content_model_viewer_view_datastream($pid, $dsid) {
 
 /**
  * Checks if an object has members.
- * 
- * @param string $pid 
- * 
+ *
+ * @param string $pid
+ *
  * @return boolean
  */
 function content_model_viewer_object_has_members($pid) {
@@ -776,12 +785,12 @@ function content_model_viewer_is_object_collection($pid) {
 
 /**
  * Checks to see if the content model of the given object is a collection.
- * 
+ *
  * Checks for the presence of a COLLECTION_POLICY datastream.
- * 
+ *
  * @param string $pid
  *   The object pid.
- * 
+ *
  * @return bool
  *   Return TRUE if the object has a collection model.
  */
@@ -799,7 +808,7 @@ function content_model_viewer_object_has_collection_model($pid) {
 
 /**
  *
- * @param type $pid 
+ * @param type $pid
  */
 function content_model_viewer_edit_metadata_form(array &$form_state, $pid) {
   module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
@@ -823,7 +832,7 @@ function content_model_viewer_edit_metadata_form(array &$form_state, $pid) {
 
 /**
  * Validate Edit Form.
- * 
+ *
  * @param array $form
  * @param array $form_state
  */
@@ -841,7 +850,7 @@ function content_model_viewer_edit_metadata_form_validate(array &$form, array &$
 
 /**
  * Submit Edit Form.
- * 
+ *
  * @param array $form
  * @param array $form_state
  */
@@ -893,7 +902,7 @@ function content_model_viewer_ingest_metadata_form(array &$form_state, $collecti
 
 /**
  * Validate Ingest Form.
- * 
+ *
  * @param array $form
  * @param array $form_state
  */
@@ -943,7 +952,7 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
 
 /**
  * Submit Ingest Form.
- * 
+ *
  * @param array $form
  * @param array $form_state
  */

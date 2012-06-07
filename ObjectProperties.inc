@@ -15,58 +15,59 @@ class ObjectProperties {
 
   /**
    * The given objects PID.
-   * 
+   *
    * @var string
    */
   protected $pid;
   /**
    * The object.
-   * 
+   *
    * @var Fedora_Item
    */
   protected $item;
   /**
    * Object's Label.
-   * 
+   *
    * @var string
    */
-  protected $label;
+  public $label;
   /**
    * Object's Owner.
-   * 
+   *
    * @var string
    */
-  protected $owner;
+  public $owner;
   /**
    * Object's State.
-   * 
+   *
    * Either Active (A), Inactive (I) or Deleted (D)
-   * 
+   *
    * @var string
    */
-  protected $state;
+  public $state;
   /**
    * The date that this object was created.
-   * 
+   *
    * @var string
    */
   protected $created;
   /**
    * The date in which this object was last modified.
-   * 
+   *
    * @var string
    */
   protected $modified;
 
   /**
-   * Creates an object that fetchs the properties of the object identified by $PID. 
+   * Creates an object that fetchs the properties of the object identified by $PID.
    * These properties can be changed, and committed back to fedora.
-   * 
-   * @param string $pid 
+   *
+   * @param string $pid
    */
   public function __construct($pid) {
     $this->pid = $pid;
     $this->item = new Fedora_Item($pid);
+    $this->foxml = $this->item->export_as_foxml();
     $this->label = $this->getLabel();
     $this->owner = $this->getOwner();
     $this->state = $this->getState();
@@ -89,9 +90,8 @@ class ObjectProperties {
    * @return string
    */
   private function getOwner() {
-    $foxml = $this->item->export_as_foxml();
     $doc = new DOMDocument();
-    $doc->loadXML($foxml);
+    $doc->loadXML($this->foxml);
     $xpath = new DOMXPath($doc);
     $result = $xpath->query("/*[local-name()='digitalObject']/*[local-name()='objectProperties']/*[local-name()='property'][@NAME='info:fedora/fedora-system:def/model#ownerId']/@VALUE");
     if ($result && $result->length == 1) {
@@ -105,10 +105,9 @@ class ObjectProperties {
    *
    * @return string
    */
-  private function getState() {
-    $foxml = $this->item->export_as_foxml();
+  public function getState() {
     $doc = new DOMDocument();
-    $doc->loadXML($foxml);
+    $doc->loadXML($this->foxml);
     $xpath = new DOMXPath($doc);
     $result = $xpath->query("/*[local-name()='digitalObject']/*[local-name()='objectProperties']/*[local-name()='property'][@NAME='info:fedora/fedora-system:def/model#state']/@VALUE");
     if ($result && $result->length == 1) {
@@ -121,6 +120,24 @@ class ObjectProperties {
       return isset($convert[$value]) ? $convert[$value] : $value;
     }
     return 'I'; // Default...
+  }
+
+/**
+   * Propagates the given properties to this fedora object.
+   *
+   * @param string $label
+   * @param string $owner
+   * @param string $state (Expected to be "A", "I", "D")
+   */
+  public function setState($state) {
+    if (!$this->validState($state)) {
+      throw new Exception("'$state' is an invalid value for a fedora object's state.");
+    }
+    if ($this->item->modify_object($this->label, $state, $this->owner)) {
+      $this->state = $state;
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -143,9 +160,9 @@ class ObjectProperties {
 
   /**
    * Checks to see if the given object state is valid.
-   * 
-   * @param string $state 
-   * 
+   *
+   * @param string $state
+   *
    * @return boolean
    */
   private function validState($state) {
@@ -154,12 +171,13 @@ class ObjectProperties {
 
   /**
    * Propagates the given properties to this fedora object.
-   * 
+   *
    * @param string $label
    * @param string $owner
    * @param string $state (Expected to be "A", "I", "D")
    */
-  public function setProperties($label, $owner, $state) {
+  public function setProperties($label, $owner, $state = NULL) {
+    $state = !isset($state) ? $this->state : $state;
     if (!$this->validState($state)) {
       throw new Exception("'$state' is an invalid value for a fedora object's state.");
     }
@@ -174,9 +192,9 @@ class ObjectProperties {
 
   /**
    * Gets the properties associated with this object as an array with the following properties.
-   * 
+   *
    * label, owner, state, created, modified
-   * 
+   *
    * @return array
    */
   public function getProperties() {
