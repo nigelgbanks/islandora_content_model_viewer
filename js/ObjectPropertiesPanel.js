@@ -40,9 +40,30 @@ Ext.onReady(function(){
         cls: 'x-btn-text-icon',
         iconCls: 'remove-datastream-icon',
         id: 'purge-object',
-        handler: function() {
-          Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
-        }
+	handler : function() {
+              Ext.Msg.show({
+                title:'Purge Object?',
+                msg: 'Are you sure you want to purge this object? This action cannot be undone.',
+                buttons: Ext.Msg.YESNO,
+                fn: function(choice) {
+                  if(choice == 'yes') {
+                    var url = ContentModelViewer.properties.url.object.purge;
+                    Ext.Ajax.request({
+                      url: url,
+                      method: 'POST',
+                      success: function(response){
+                        var data;
+                        data = Ext.decode(response.responseText);
+                        Ext.Msg.alert('Status', data.msg);
+                        if (data.success === true) {
+                          window.location.href = Drupal.settings.basePath + 'fedora/repository';                  }
+                      }
+                    });
+                  }
+                },
+                icon: Ext.window.MessageBox.QUESTION
+              });
+            }
       }]
     }],
     items: [{
@@ -69,26 +90,10 @@ Ext.onReady(function(){
         name: 'owner',
         width: 350
       }, {
-        xtype: 'combobox',
+        xtype: 'displayfield',
         fieldLabel: 'State',
         name: 'state',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'value',
-        value: 'I',
-        store: Ext.create('Ext.data.Store', {
-          fields: ['value', 'name'],
-          data : [{
-            value:'A', 
-            name:'Active'
-          }, {
-            value:'I', 
-            name:'Inactive'
-          }, {
-            value:'D', 
-            name:'Deleted'
-          }]
-        })
+        width: 400
       }, {
         xtype: 'displayfield',
         fieldLabel: 'Date Created',
