@@ -637,9 +637,12 @@ function content_model_viewer_purge_object($pid) {
     if ($results != '') {
       $xml = simplexml_load_string($results);
       $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
-      $children = $xml->xpath("//ns:result/ns:p[@uri!='info:fedora/$pid']");
-      $count = count($children);
-      if($count == 0) {
+      $children = $xml->xpath("//ns:result/ns:o/@uri"); // Each unique child ignore another parents.
+      $counts = array();
+      foreach($children as $child) {
+        $counts[(string)$child]++;
+      }
+      if(empty($counts) || min($counts) > 1) { // All child concepts/resource belong to other concepts
         $success = $properties->setState('D');
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
