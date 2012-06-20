@@ -502,6 +502,7 @@ function content_model_viewer($pid = NULL) {
 function content_model_viewer_overview($pid) {
   $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
   try {
+    AbstractModel::LoadRequiredResourcesFor($pid);
     $data = $viewer->render();
     $func = $viewer->getInitializationFunction();
     $javascript = drupal_add_js(NULL, NULL, 'header');
@@ -510,7 +511,13 @@ function content_model_viewer_overview($pid) {
       $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
       unset($settings['ahah']['']);
     }
-    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
+    $js = $javascript['module'];
+    $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
+    $files = array();
+    foreach($js as $path => $properties) {
+      $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
+    }
+    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings, 'js' => $files));
   } catch (Exception $e) {
     drupal_set_message($e->getMessage());
   }
@@ -683,7 +690,7 @@ function content_model_viewer_add_datastream($pid) {
         $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
       }
     } catch (Exception $e) {
-// log some error...
+      // log some error...
     }
   }
   $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
@@ -893,9 +900,9 @@ function content_model_viewer_ingest_metadata_form(array &$form_state, $collecti
   module_load_include('inc', 'fedora_repository', 'SecurityClass');
   $security_class = new SecurityClass();
   if (!$security_class->canIngestHere($collection_pid)) {
-// Queries the collection object for a child security datastream and if found parses it
-// to determine if this user is allowed to ingest in this collection
-// we assume if they are able to modify objects in the collection they can ingest as well.
+    // Queries the collection object for a child security datastream and if found parses it
+    // to determine if this user is allowed to ingest in this collection
+    // we assume if they are able to modify objects in the collection they can ingest as well.
     drupal_set_message(t('You do not have premission to ingest here.'));
     return FALSE;
   }
@@ -950,7 +957,7 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
         if (!empty($file)) {
           if (!in_array($format, $allowed_mime_types)) {
             form_set_error('ingest-file-location', t('The uploaded file\'s mimetype (' . $format . ') is not associated with this Content Model. The allowed types are ' .
-                    implode(' ', $allowed_mime_types)));
+                implode(' ', $allowed_mime_types)));
             file_delete($file);
             return;
           }
