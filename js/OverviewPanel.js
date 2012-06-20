@@ -7,7 +7,7 @@ Ext.onReady(function(){
     },
     constructor: function(config) {
       this.callParent(arguments);
-      var url = ContentModelViewer.properties.url;  
+      var url = ContentModelViewer.properties.url;
       var content = Ext.create('Ext.panel.Panel', {
         html: '<div>Loading...</div>',
         itemId: 'content',
@@ -21,6 +21,14 @@ Ext.onReady(function(){
             if(json.settings !== null) { // Update settings.
               jQuery.extend(Drupal.settings, json.settings);
               Drupal.attachBehaviors();
+            }
+            if(json.js.length > 0) {
+              for(var i = 0; i < json.js.length; i++) {
+                var file = json.js[i];
+                if($('head > script[src="' + file + '"]').length == 0) {
+                  $.getScript(file);
+                }
+              }
             }
             if(json.func) {
               eval(json.func)();
