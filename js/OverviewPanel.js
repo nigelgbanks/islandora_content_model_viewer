@@ -7,6 +7,7 @@ Ext.onReady(function(){
     },
     constructor: function(config) {
       this.callParent(arguments);
+      var loaded = new Array();
       var url = ContentModelViewer.properties.url;
       var content = Ext.create('Ext.panel.Panel', {
         html: '<div>Loading...</div>',
@@ -25,7 +26,8 @@ Ext.onReady(function(){
             if(json.js.length > 0) {
               for(var i = 0; i < json.js.length; i++) {
                 var file = json.js[i];
-                if($('head > script[src="' + file + '"]').length == 0) {
+                if($('head > script[src="' + file + '"]').length == 0 && $.inArray(file, loaded) < 0) {
+                  loaded.push(file);
                   $.getScript(file);
                 }
               }
