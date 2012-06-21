@@ -74,6 +74,12 @@ function content_model_viewer_menu() {
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS),
     'type' => MENU_CALLBACK,
   );
+  $items['viewer/%/collection/remove/%'] = array(
+    'page callback' => 'content_model_viewer_remove_from_collection',
+    'page arguments' => array(1, 4, 5),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_OBJECT_PROPERTIES),
+    'type' => MENU_CALLBACK,
+  );
   $items['viewer/%/add'] = array(
     'page callback' => 'content_model_viewer_add_datastream',
     'page arguments' => array(1),
@@ -665,6 +671,33 @@ function content_model_viewer_purge_object($pid) {
   exit();
 }
 
+/**
+ *
+ */
+function content_model_viewer_remove_from_collection($pid, $value) {
+  module_load_include('inc', 'fedora_repository', 'CollectionClass');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+    and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $o
+    or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf>';
+  $collection = new CollectionClass();
+  $results = $collection->getRelatedItems($pid, $query);
+  $results = trim($results);
+  if ($results != '') {
+    $xml = simplexml_load_string($results);
+    $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
+    $parents = $xml->xpath("//ns:result/ns:o/@uri");
+    if(count($parents) < 2) {
+      echo json_encode(array('success' => FALSE, 'msg' => t('Object cannot be orphaned')));
+      exit();
+    }
+  }
+  $item = new Fedora_Item($pid);
+  $item->purge_relationship('rel:isMemberOf', $value);
+  $item->purge_relationship('rel:isMemberOfCollection', $value);
+  echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
+  exit();
+}
 /**
  * Adds a datastream to the object identified by $pid.*
  *
