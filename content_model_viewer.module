@@ -77,7 +77,7 @@ function content_model_viewer_menu() {
   $items['viewer/%/collection/remove/%'] = array(
     'page callback' => 'content_model_viewer_remove_from_collection',
     'page arguments' => array(1, 4, 5),
-    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_OBJECT_PROPERTIES),
+    'access arguments' => array('edit fedora meta data'),
     'type' => MENU_CALLBACK,
   );
   $items['viewer/%/add'] = array(
