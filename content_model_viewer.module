@@ -450,7 +450,6 @@ function content_model_viewer($pid = NULL) {
   $js_path = $path . '/js';
   if (isset($_POST['action'])) { // Render Metadata Form
     $action = $_POST['action'];
-    drupal_add_js($js_path . '/Form.js');
     return theme('content_model_viewer_metadata_form', $pid, $action);
   }
   else {
