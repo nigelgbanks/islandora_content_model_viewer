@@ -72,6 +72,7 @@ ContentModelViewer.setup.initProperties = function() {
     }
   };
   // Set properties @todo get collection/focused from URL # if possible.
+  properties.root = $('#root').text();
   properties.pid = $('#pid').text();
   properties.pids = {
     collection: properties.pid,
@@ -124,8 +125,8 @@ ContentModelViewer.setup.defineFunctions = function() {
       if(hideResource) { // Don't need to hide the resource if the concept was selected from the resource overview panel
         this.hideResource();
       }
-      this.showConcept();
-      this.showResources();
+      this.showConcept(pid);
+      this.showResources(pid);
       this.showViewer(pid);
       this.showManage(pid);
       // TODO handle the auto focus of this action onto the concept overview panel
@@ -138,7 +139,7 @@ ContentModelViewer.setup.defineFunctions = function() {
       this.showManage(pid);
       // TODO handle the auto focus of viewer if possible or resource overview if not.
     },
-    // Shows the concept in its overview panel, creates the panel if it doesn't already exist.
+    // Shows the concept in its overview panel, creates the panel if it doesn't already exist. If no pid is give it just refreshes
     showConcept: function(pid) {
       pid = pid || properties.pids.concept;
       var tabpanel = Ext.getCmp('cmvtabpanel');
@@ -160,7 +161,7 @@ ContentModelViewer.setup.defineFunctions = function() {
       var tabpanel = Ext.getCmp('cmvtabpanel');
       var overview = tabpanel.getComponent('resource-overview');
       if(!overview && ContentModelViewer.widgets.OverviewPanel != undefined) { // Create the panel and insert it in the first position if it doesn't exist.
-        tabpanel.insert(3, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+        tabpanel.insert(2, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
           title:'Resource Overview',
           itemId: 'resource-overview',
           pid: pid
@@ -216,6 +217,24 @@ ContentModelViewer.setup.defineFunctions = function() {
       else if(panel) {
         panel.setPid(pid);
       }
+    },
+    //
+    refreshConcept: function() {
+      var panel = Ext.getCmp('cmvtabpanel').getComponent('concept-overview');
+      if(panel) {
+        panel.refresh();
+      }
+    },
+    //
+    refreshResource: function() {
+      var panel = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
+      if(panel) {
+        panel.refresh();
+      }
+    },
+    // Reloads the tree data.
+    refreshTree: function() {
+      Ext.data.StoreManager.lookup('treemembers').load();
     },
     // Olderstuff
     // This pid determines whats shown in the tree and if the ConceptOverview is shown

@@ -4,6 +4,7 @@
   <h1><?php print $label; ?></h1>
   <br/>
   <div style="display:none" id="properties">
+    <div id="root"><?php print $root; ?></div>
     <div id="pid"><?php print $pid; ?></div>
     <div id="dsid"><?php print $dsid; ?></div>
     <div id="view_function"><?php print $view_function; ?></div>

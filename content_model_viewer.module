@@ -395,6 +395,7 @@ function template_preprocess_content_model_viewer(array &$variables) {
   module_load_include('inc', 'content_model_viewer', 'Collection');
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
+  $variables['root'] = variable_get('fedora_repository_pid', 'islandora:root');
   $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
   $variables['label'] = $item->objectProfile->objLabel;
   $variables['base_url'] = $base_url;
