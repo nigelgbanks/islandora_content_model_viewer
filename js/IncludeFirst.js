@@ -17,7 +17,7 @@ ContentModelViewer.setup.initContentArea = function() {
     var content_model_viewer = $('#content-model-viewer');
     var content = content_model_viewer.remove();
     parent.empty();
-    parent.append(content);    
+    parent.append(content);
   }
 }
 /**
@@ -26,7 +26,7 @@ ContentModelViewer.setup.initContentArea = function() {
 ContentModelViewer.setup.initExtJSFeatures = function() {
   var expirationDateTime = new Date().getTime()+(1000*60*60*24*7); // 7 days from now
   Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
-    expires: new Date(expirationDateTime) 
+    expires: new Date(expirationDateTime)
   }));
   Ext.QuickTips.init();
 }
@@ -60,7 +60,7 @@ ContentModelViewer.setup.initProperties = function() {
       return temp.replace('/pid/', '/'+pid+'/');
     }
   };
-  /** 
+  /**
    * Create a function for generating a url from a store url and a pid/dsid.
    */
   var url_replace_pid_dsid_func = function(id) {
@@ -109,11 +109,11 @@ ContentModelViewer.setup.defineFunctions = function() {
      * So we can add the autocomplete.js
      */
     addAutoCompleteJavascript: function(){
-      var th = document.getElementsByTagName('head')[0];
+      /*var th = document.getElementsByTagName('head')[0];
       var s = document.createElement('script');
       s.setAttribute('type','text/javascript');
       s.setAttribute( 'src', '/misc/autocomplete.js');
-      th.appendChild(s);
+      th.appendChild(s);*/
     },
     /**
      * Download Datastream using hidden html form that is rendered with the Viewer.tpl.php
@@ -192,25 +192,25 @@ ContentModelViewer.setup.defineModels = function() {
   Ext.define('ContentModelViewer.models.FedoraObject', {
     extend: 'Ext.data.Model',
     fields: [{
-      name: 'pid',  
+      name: 'pid',
       type: 'string'
     },{
-      name: 'link',  
+      name: 'link',
       type: 'string'
     }, {
-      name: 'label',  
+      name: 'label',
       type: 'string'
     }, {
-      name: 'description',   
+      name: 'description',
       type: 'string'
     }, {
-      name: 'owner', 
+      name: 'owner',
       type: 'string'
     }, {
-      name: 'created', 
+      name: 'created',
       type: 'string'
     }, {
-      name: 'modified', 
+      name: 'modified',
       type: 'string'
     }, {
       name: 'tn',
@@ -221,7 +221,7 @@ ContentModelViewer.setup.defineModels = function() {
     },{
       name: 'originalMetadata',
       type: 'boolean',
-      defaultValue: false 
+      defaultValue: false
     }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
@@ -239,23 +239,23 @@ ContentModelViewer.setup.defineModels = function() {
   Ext.define('ContentModelViewer.models.ObjectProperties', {
     extend: 'Ext.data.Model',
     fields: [{
-      name: 'label',  
+      name: 'label',
       type: 'string'
     }, {
-      name: 'state',   
+      name: 'state',
       type: 'string'
     }, {
-      name: 'owner', 
+      name: 'owner',
       type: 'string'
     }, {
-      name: 'created', 
+      name: 'created',
       type: 'string'
     }, {
-      name: 'modified', 
+      name: 'modified',
       type: 'string'
     },],
     validations: [{
-      type: 'inclusion', 
+      type: 'inclusion',
       field: 'state',
       list: ['Active', 'Inactive', 'Deleted']
     }]
@@ -264,42 +264,42 @@ ContentModelViewer.setup.defineModels = function() {
     extend: 'Ext.data.Model',
     idProperty: 'dsid',
     fields: [{
-      name: 'dsid',  
+      name: 'dsid',
       type: 'string'
     }, {
-      name: 'label',  
+      name: 'label',
       type: 'string'
     }, {
-      name: 'state',   
+      name: 'state',
       type: 'string'
     }, {
-      name: 'created', 
+      name: 'created',
       type: 'string'
     }, {
-      name: 'mime', 
+      name: 'mime',
       type: 'string'
     }, {
-      name: 'view', 
+      name: 'view',
       type: 'string'
     }, {
-      name: 'download', 
+      name: 'download',
       type: 'string'
     }, {
-      name: 'tn', 
+      name: 'tn',
       type: 'string'
     }, {
-      name: 'view_function', 
+      name: 'view_function',
       type: 'string'
     }, {
-      name: 'edit', 
+      name: 'edit',
       type: 'bool'
     }, {
-      name: 'default', 
+      name: 'default',
       type: 'bool'
     }],
     validations: [{
-      type: 'inclusion', 
-      field: 'state',   
+      type: 'inclusion',
+      field: 'state',
       list: ['A', 'I']
     }],
     proxy: {

@@ -18,12 +18,9 @@ Ext.onReady(function(){
           url: url.object.overview(config.pid),
           renderer: function(loader, response, active) {
             var json = Ext.JSON.decode(response.responseText);
-            loader.getTarget().update(json.data);
-            if(json.settings !== null) { // Update settings.
-              jQuery.extend(Drupal.settings, json.settings);
-              Drupal.attachBehaviors();
-            }
-            if(json.js.length > 0) {
+            loader.getTarget().update(json.data); // Update Panel
+            if(json.js.length > 0) { // Load new JS files
+              $.ajaxSetup({async:false});
               for(var i = 0; i < json.js.length; i++) {
                 var file = json.js[i];
                 if($('head > script[src="' + file + '"]').length == 0 && $.inArray(file, loaded) < 0) {
@@ -31,9 +28,14 @@ Ext.onReady(function(){
                   $.getScript(file);
                 }
               }
+              $.ajaxSetup({async:true});
+            }
+            if(json.settings !== null) { // Update settings.
+              jQuery.extend(Drupal.settings, json.settings);
+              Drupal.attachBehaviors();
             }
             if(json.func) {
-              eval(json.func)();
+              eval(json.func)(); // Execute custom function
             }
             return true;
           },
