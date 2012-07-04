@@ -58,6 +58,16 @@ Ext.onReady(function(){
         url: url.object.overview(pid)
       });
     },
+    refresh: function() {
+      var files = this.getComponent('files');
+      files.setPid(this.pid);
+      var content = this.getComponent('content');
+      var loader = content.getLoader();
+      var url = ContentModelViewer.properties.url;
+      loader.load({
+        url: url.object.overview(this.pid)
+      });
+    },
     itemId: 'overview',
     title: 'Overview',
     layout: {
