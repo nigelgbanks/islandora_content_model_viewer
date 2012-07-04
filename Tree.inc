@@ -2,7 +2,7 @@
 
 /**
  * @file
- * 
+ *
  * Helper for generating the proper JSON for populating the Tree panel, which renders
  * Collections aka 'Concepts'
  */
@@ -32,15 +32,15 @@ class Tree {
 
   /**
    * Parents of current PID
-   * @var type 
+   * @var type
    */
   private $parents = array();
 
   /**
    * Constructor
-   * 
+   *
    * @param string $pid
-   * @param string $node 
+   * @param string $node
    */
   public function __construct($pid, $node = null) {
     $this->pid = $pid;
@@ -49,17 +49,17 @@ class Tree {
   }
 
   /**
-   * Get tree returns a JSON formated string of the tree structure requested. 
-   * 
+   * Get tree returns a JSON formated string of the tree structure requested.
+   *
    * @return string
-   *   JSON encoded string. 
+   *   JSON encoded string.
    */
   public function getTree() {
     /**
-     * A pid is passed in via the drupal menu that represents the page your on. A second pid is 
+     * A pid is passed in via the drupal menu that represents the page your on. A second pid is
      * passed by the tree when the nod is expanded. This requested_pid is the pid passed by the tree.
-     * If it is not set or if it is root, then we want to build the tree based on the root node, 
-     * otherwise build the tree for the passed node. 
+     * If it is not set or if it is root, then we want to build the tree based on the root node,
+     * otherwise build the tree for the passed node.
      */
     $requested_pid = (!isset($this->node) || $this->node == 'root') ? $this->root : $this->node;
     $this->getParents($this->pid); // Sets an instance variable used in other functions thoughout this function.
@@ -69,10 +69,10 @@ class Tree {
 
   /**
    * Recursive function to build tree
-   * 
+   *
    * @param string $pid
-   * 
-   * @return string 
+   *
+   * @return string
    */
   private function buildTree($pid) {
     module_load_include('inc', 'content_model_viewer', 'Collection');
@@ -86,10 +86,10 @@ class Tree {
 
   /**
    * Create a node in the tree with the given object properties.
-   * 
+   *
    * @param array $member
    *   The object properties for the given member of some parent collection.
-   * 
+   *
    * @return array
    *   A node definition for the given object properties.
    */
@@ -112,7 +112,7 @@ class Tree {
 
   /**
    * Should the node be expanded in the display?
-   * 
+   *
    * @param string $pid
    *   The node in question.
    * @return boolean
@@ -123,10 +123,10 @@ class Tree {
   }
 
   /**
-   * This function queries the resource index to find all the parents of the requested pid. 
+   * This function queries the resource index to find all the parents of the requested pid.
    * When we are building the tree, we need to know the parents to know which nodes to expand.
-   * 
-   * @param string $pid 
+   *
+   * @param string $pid
    */
   private function getParents($pid) {
     return;//Thorny does not want the auto expand so just do this for now in case he wants it back

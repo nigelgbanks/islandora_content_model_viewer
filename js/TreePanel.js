@@ -1,5 +1,6 @@
 Ext.define('ContentModelViewer.widgets.TreePanel', {
   extend: 'Ext.tree.Panel',
+  id: 'cmvtreepanel',
   viewConfig : {selectedItemCls : "even"},
   region: 'west',
   folderSort: false,
@@ -51,7 +52,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
 		conceptOverview.setPid(pid);
 		cmv.properties.pids.focused = pid;
 		viewer.setPid(pid);manage.setPid(pid);
-                
+
 		var resourceOverview = tabpanel.getComponent('resource-overview');
 		//tabpanel.remove(resourceOverview);
       }
