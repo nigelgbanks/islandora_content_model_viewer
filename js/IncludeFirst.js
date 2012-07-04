@@ -119,28 +119,29 @@ ContentModelViewer.setup.defineFunctions = function() {
       document.forms["datastream-download-form"].submit();
     },
     // Shows a Collection, triggered by selecting a parent in the concept/resource overview, or by selecting a item in the treepanel. Can't hide a collection.
-    selectConcept: function(pid, hideResource) {
-      hideResource = hideResource || true;
-      properties.pids.concept = pid;
-      if(hideResource) { // Don't need to hide the resource if the concept was selected from the resource overview panel
-        this.hideResource();
+    selectConcept: function(pid, closeResourceTab) {
+      closeResourceTab = (closeResourceTab == undefined) ? true : closeResourceTab;
+      properties.pids.concept = pid || properties.pids.concept;
+      if(closeResourceTab) { // Don't need to hide the resource if the concept was selected from the resource overview panel
+        this.closeResource();
       }
-      this.showConcept(pid);
-      this.showResources(pid);
-      this.showViewer(pid);
-      this.showManage(pid);
-      // TODO handle the auto focus of this action onto the concept overview panel
+      this.loadConcept(pid);
+      this.loadResources(pid);
+      this.loadViewer(pid);
+      this.loadManage(pid);
+      this.showConcept();
     },
     // The user has selected a resource.
     selectResource: function(pid) {
       properties.pids.resource = pid;
+      this.loadResource();
+      this.loadViewer(pid);
+      this.loadManage(pid);
       this.showResource();
-      this.showViewer(pid);
-      this.showManage(pid);
       // TODO handle the auto focus of viewer if possible or resource overview if not.
     },
     // Shows the concept in its overview panel, creates the panel if it doesn't already exist. If no pid is give it just refreshes
-    showConcept: function(pid) {
+    loadConcept: function(pid) {
       pid = pid || properties.pids.concept;
       var tabpanel = Ext.getCmp('cmvtabpanel');
       var overview = tabpanel.getComponent('concept-overview');
@@ -156,7 +157,7 @@ ContentModelViewer.setup.defineFunctions = function() {
       }
     },
     // Shows a Resource, has no effect on the Current Collection, Focus Viewer and Manage panels on the Resource.
-    showResource: function(pid) {
+    loadResource: function(pid) {
       pid = pid || properties.pids.resource;
       var tabpanel = Ext.getCmp('cmvtabpanel');
       var overview = tabpanel.getComponent('resource-overview');
@@ -172,14 +173,14 @@ ContentModelViewer.setup.defineFunctions = function() {
       }
     },
     // Hides the Resource Panel changes the focus of the
-    hideResource: function() {
+    closeResource: function() {
       var overview = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
       if(overview) {
         overview.close();
       }
     },
     // Display the collection panel with all of the given concepts resources.
-    showResources: function(pid) {
+    loadResources: function(pid) {
       pid = pid || properties.pids.concept;
       var resources = Ext.getCmp('collectionpanel');
       if(!resources && ContentModelViewer.widgets.CollectionPanel != undefined) { // Create the panel and insert it in the after the Concept Overview if it doesn't exist.
@@ -192,7 +193,7 @@ ContentModelViewer.setup.defineFunctions = function() {
       }
     },
     // Display the viewer
-    showViewer: function (pid) {
+    loadViewer: function (pid) {
       var panel = Ext.getCmp('viewerpanel');
       var dsid, viewFunction;
       // @TODO get the rest of the params
@@ -207,7 +208,7 @@ ContentModelViewer.setup.defineFunctions = function() {
         panel.setPid(pid);
       }
     },
-    showManage: function(pid) {
+    loadManage: function(pid) {
       var panel = Ext.getCmp('managepanel');
       if(!panel && ContentModelViewer.widgets.ManagePanel != undefined) { // Create the panel and insert it in the last position if it doesn't exist.
         Ext.getCmp('cmvtabpanel').add(Ext.create('ContentModelViewer.widgets.ManagePanel', {
@@ -235,6 +236,31 @@ ContentModelViewer.setup.defineFunctions = function() {
     // Reloads the tree data.
     refreshTree: function() {
       Ext.data.StoreManager.lookup('treemembers').load();
+    },
+    //
+    showConcept: function() {
+      var tabpanel = Ext.getCmp('cmvtabpanel');
+      var panel = tabpanel.getComponent('concept-overview');
+      if(panel) {
+        Ext.getCmp('cmvtabpanel').setActiveTab(panel);
+      }
+    },
+    //
+    showResource: function() {
+      var tabpanel = Ext.getCmp('cmvtabpanel');
+      var panel = tabpanel.getComponent('resource-overview');
+      if(panel) {
+        // Check to see if we can show the viewer?
+        tabpanel.setActiveTab(panel);
+      }
+    },
+    //
+    showViewer: function() {
+      var panel = Ext.getCmp('viewerpanel');
+      if(panel) {
+        Ext.getCmp('cmvtabpanel').setActiveTab(panel);
+        // TODO set the default view datastream? or do so in the load function?
+      }
     },
     // Olderstuff
     // This pid determines whats shown in the tree and if the ConceptOverview is shown
