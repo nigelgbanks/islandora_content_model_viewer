@@ -51,14 +51,7 @@ Ext.onReady(function(){
     },
     setPid: function(pid) {
       this.pid = pid;
-      var files = this.getComponent('files');
-      files.setPid(pid);
-      var content = this.getComponent('content');
-      var loader = content.getLoader();
-      var url = ContentModelViewer.properties.url;
-      loader.load({
-        url: url.object.overview(pid)
-      });
+      this.refresh();
     },
     refresh: function() {
       var files = this.getComponent('files');

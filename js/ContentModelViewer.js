@@ -8,11 +8,11 @@ Ext.onReady(function(){
   var properties = ContentModelViewer.properties;
   var widgets = ContentModelViewer.widgets;
   var pid = properties.pid,
-  collectionPid = properties.pids.collection, 
-  focusedPid = properties.pids.focused, 
+  collectionPid = properties.pids.collection,
+  focusedPid = properties.pids.focused,
   dsid = properties.dsid,
   viewFunction = properties.viewFunction;
-  
+
   // Init system
   setup.initContentArea();
   setup.initExtJSFeatures();
@@ -21,7 +21,7 @@ Ext.onReady(function(){
    * Assuming we can get the Collection PID, and Focus PID from the #URL
    */
   var tabs = [];
-  if(widgets.OverviewPanel !== undefined) {
+  /*if(widgets.OverviewPanel !== undefined) {
     if(properties.isCollection) {
       tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
         title:'Concept Overview',
@@ -55,7 +55,8 @@ Ext.onReady(function(){
     tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel', {
       pid:focusedPid
     }));
-  }
+  }*/
+
   // Create container for Application
   ContentModelViewer.container =  Ext.create('Ext.container.Container', {
     renderTo: 'content-model-viewer',
@@ -82,8 +83,8 @@ Ext.onReady(function(){
             this.setActiveTab(token);
           }
         }
-      } 
+      }
     }]
-  }); 
+  });
   setup.setUpGlobalEvents();
 });

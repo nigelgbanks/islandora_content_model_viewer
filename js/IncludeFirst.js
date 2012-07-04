@@ -75,6 +75,8 @@ ContentModelViewer.setup.initProperties = function() {
   properties.pid = $('#pid').text();
   properties.pids = {
     collection: properties.pid,
+    concept: properties.pid,
+    resource: properties.pid,
     focused: properties.pid
   }
   properties.dsid = $('#dsid').text();
@@ -106,16 +108,6 @@ ContentModelViewer.setup.defineFunctions = function() {
   var url = properties.url;
   ContentModelViewer.functions = {
     /**
-     * So we can add the autocomplete.js
-     */
-    addAutoCompleteJavascript: function(){
-      /*var th = document.getElementsByTagName('head')[0];
-      var s = document.createElement('script');
-      s.setAttribute('type','text/javascript');
-      s.setAttribute( 'src', '/misc/autocomplete.js');
-      th.appendChild(s);*/
-    },
-    /**
      * Download Datastream using hidden html form that is rendered with the Viewer.tpl.php
      */
     downloadDatastream: function(pid, dsid) {
@@ -125,6 +117,107 @@ ContentModelViewer.setup.defineFunctions = function() {
       });
       document.forms["datastream-download-form"].submit();
     },
+    // Shows a Collection, triggered by selecting a parent in the concept/resource overview, or by selecting a item in the treepanel. Can't hide a collection.
+    selectConcept: function(pid, hideResource) {
+      hideResource = hideResource || true;
+      properties.pids.concept = pid;
+      if(hideResource) { // Don't need to hide the resource if the concept was selected from the resource overview panel
+        this.hideResource();
+      }
+      this.showConcept();
+      this.showResources();
+      this.showViewer(pid);
+      this.showManage(pid);
+      // TODO handle the auto focus of this action onto the concept overview panel
+    },
+    // The user has selected a resource.
+    selectResource: function(pid) {
+      properties.pids.resource = pid;
+      this.showResource();
+      this.showViewer(pid);
+      this.showManage(pid);
+      // TODO handle the auto focus of viewer if possible or resource overview if not.
+    },
+    // Shows the concept in its overview panel, creates the panel if it doesn't already exist.
+    showConcept: function(pid) {
+      pid = pid || properties.pids.concept;
+      var tabpanel = Ext.getCmp('cmvtabpanel');
+      var overview = tabpanel.getComponent('concept-overview');
+      if(!overview && ContentModelViewer.widgets.OverviewPanel != undefined) { // Create the panel and insert it in the first position if it doesn't exist.
+        tabpanel.insert(0, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+          title:'Concept Overview',
+          itemId: 'concept-overview',
+          pid: pid
+        }));
+      }
+      else if (overview) {
+        overview.setPid(pid)
+      }
+    },
+    // Shows a Resource, has no effect on the Current Collection, Focus Viewer and Manage panels on the Resource.
+    showResource: function(pid) {
+      pid = pid || properties.pids.resource;
+      var tabpanel = Ext.getCmp('cmvtabpanel');
+      var overview = tabpanel.getComponent('resource-overview');
+      if(!overview && ContentModelViewer.widgets.OverviewPanel != undefined) { // Create the panel and insert it in the first position if it doesn't exist.
+        tabpanel.insert(3, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+          title:'Resource Overview',
+          itemId: 'resource-overview',
+          pid: pid
+        }));
+      }
+      else if (overview) {
+        overview.setPid(pid)
+      }
+    },
+    // Hides the Resource Panel changes the focus of the
+    hideResource: function() {
+      var overview = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
+      if(overview) {
+        overview.close();
+      }
+    },
+    // Display the collection panel with all of the given concepts resources.
+    showResources: function(pid) {
+      pid = pid || properties.pids.concept;
+      var resources = Ext.getCmp('collectionpanel');
+      if(!resources && ContentModelViewer.widgets.CollectionPanel != undefined) { // Create the panel and insert it in the after the Concept Overview if it doesn't exist.
+        Ext.getCmp('cmvtabpanel').insert(1, Ext.create('ContentModelViewer.widgets.CollectionPanel', {
+          pid: pid
+        }));
+      }
+      else if(resources) {
+        resources.setPid(pid); // The Collection panel should show the resources of the given concept.
+      }
+    },
+    // Display the viewer
+    showViewer: function (pid) {
+      var panel = Ext.getCmp('viewerpanel');
+      var dsid, viewFunction;
+      // @TODO get the rest of the params
+      if(!panel && ContentModelViewer.widgets.ViewerPanel != undefined) { // Create the panel and insert it in the first position if it doesn't exist.
+        Ext.getCmp('cmvtabpanel').add(Ext.create('ContentModelViewer.widgets.ViewerPanel', {
+          pid: pid,
+          dsid: dsid,
+          viewFunction: viewFunction
+        }));
+      }
+      else if(panel) {
+        panel.setPid(pid);
+      }
+    },
+    showManage: function(pid) {
+      var panel = Ext.getCmp('managepanel');
+      if(!panel && ContentModelViewer.widgets.ManagePanel != undefined) { // Create the panel and insert it in the last position if it doesn't exist.
+        Ext.getCmp('cmvtabpanel').add(Ext.create('ContentModelViewer.widgets.ManagePanel', {
+          pid: pid
+        }));
+      }
+      else if(panel) {
+        panel.setPid(pid);
+      }
+    },
+    // Olderstuff
     // This pid determines whats shown in the tree and if the ConceptOverview is shown
     setCollectionPid: function(pid) {
       properties.pids.collection = pid;

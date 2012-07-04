@@ -32,7 +32,7 @@ Ext.onReady(function(){
       }
     };
   })();
-  
+
   Ext.define('ContentModelViewer.widgets.CollectionPanel', {
     extend: 'Ext.panel.Panel',
     id: 'collectionpanel',
@@ -55,7 +55,7 @@ Ext.onReady(function(){
       xtype: 'toolbar',
       dock: 'top',
       items: [ {
-        xtype: 'tbtext', 
+        xtype: 'tbtext',
         text: 'Sort By: '
       }, Ext.create('Ext.Action', {
         text : sorter.label(),
@@ -121,7 +121,7 @@ Ext.onReady(function(){
       id: 'collection-pager-bottom',
       xtype: 'pagingtoolbar',
       store: Ext.data.StoreManager.lookup('members'),   // same store GridPanel is using
-      dock: 'bottom', 
+      dock: 'bottom',
       displayInfo: true
     }],
     items: [{
@@ -162,16 +162,24 @@ Ext.onReady(function(){
         }),
       listeners: {
         selectionchange: function(view, selections, options) {
+          var record = selections[0];
+          if(record) {
+            var pid = record.get('pid');
+            ContentModelViewer.functions.selectResource(pid);
+          }
+          /*
           var func = ContentModelViewer.functions;
           var record = selections[0];
           if(record) {
             var pid = record.get('pid');
             var isCollection = record.get('isCollection');
             func.setFocusedPid(pid, isCollection);
-          }
+          }*/
         },
         itemdblclick: function(view, record) {
-          var func = ContentModelViewer.functions;
+          var pid = record.get('pid');
+          ContentModelViewer.functions.selectResource(pid);
+          /*var func = ContentModelViewer.functions;
           var pid = record.get('pid');
           var isCollection = record.get('isCollection');
           if(isCollection) {
@@ -180,7 +188,7 @@ Ext.onReady(function(){
           }
           else {
             func.setCollectionPid(pid, isCollection);
-          }
+          }*/
         }
       }
     }]
