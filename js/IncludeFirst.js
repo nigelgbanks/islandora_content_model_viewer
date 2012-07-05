@@ -235,7 +235,10 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     // Reloads the tree data.
     refreshTree: function() {
-      Ext.data.StoreManager.lookup('treemembers').load();
+      var store = Ext.data.StoreManager.lookup('treemembers');
+      if(!store.isLoading()) {
+        Ext.data.StoreManager.lookup('treemembers').load();
+      }
     },
     //
     showConcept: function() {
@@ -459,7 +462,7 @@ ContentModelViewer.setup.createStores = function() {
   var url = properties.url, pid = properties.pid, dsid = properties.dsid;
   /**
    * Collection Members
-   */
+   *
   Ext.create('Ext.data.Store', {
     storeId:'members',
     model: models.FedoraObject,
@@ -484,7 +487,7 @@ ContentModelViewer.setup.createStores = function() {
         root: 'data'
       }
     }
-  });
+  });*/
   /**
    * Tree Store
    */

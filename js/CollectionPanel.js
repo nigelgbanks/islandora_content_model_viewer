@@ -33,12 +33,18 @@ Ext.onReady(function(){
     };
   })();
 
-  Ext.define('ContentModelViewer.widgets.CollectionPanel', {
+  Ext.define('ContentModelViewer.widgets.CollectionPanels', {
     extend: 'Ext.panel.Panel',
     id: 'collectionpanel',
     itemId: 'collection',
     title: 'Resources',
+    constructor: function(config) {
+      this.callParent(arguments);
+      this.store =
+      this.setPid(config.pid);
+    },
     setPid: function(pid) {
+      this.getComponent('collectiondataview');
       this.pid = pid;
       var store = Ext.data.StoreManager.lookup('members');
       store.setProxy({
@@ -54,26 +60,9 @@ Ext.onReady(function(){
     dockedItems: [{
       xtype: 'toolbar',
       dock: 'top',
-      items: [ {
+      items: [{
         xtype: 'tbtext',
         text: 'Sort By: '
-      }, Ext.create('Ext.Action', {
-        text : sorter.label(),
-        handler: function(action, event) {
-          sorter.toggleType();
-          action.setText(sorter.label());
-          sorter.refresh();
-        }
-      }), {
-        xtype: 'sortbutton',
-        text : sorter.direction(),
-        listeners: {
-          changedirection: function(direction) {
-            sorter.toggleDirection();
-            this.setText(sorter.direction());
-            sorter.refresh();
-          }
-        }
       }, {
         xtype: 'tbtext',
         text: 'Search'
@@ -84,20 +73,20 @@ Ext.onReady(function(){
         xtype: 'button',
         text: 'Go',
         handler: function(button, event) {
-          var store = Ext.data.StoreManager.lookup('members');
-          var filters = store.filters;
-          var label = filters.get(0);
-          var toolbar = button.up('toolbar');
-          var search = toolbar.down('textfield');
-          var value = Ext.String.trim(search.getValue());
-          label.value = value != '' ? value : null;
-          store.load();
+          // var store = Ext.data.StoreManager.lookup('members');
+          // var filters = store.filters;
+          // var label = filters.get(0);
+          // var toolbar = button.up('toolbar');
+          // var search = toolbar.down('textfield');
+          // var value = Ext.String.trim(search.getValue());
+          // label.value = value != '' ? value : null;
+          // store.load();
         }
       }, '->', {
         xtype: 'button',
         text: 'Add resources',
         handler: function(button, event) {
-          var form = Ext.get("datastream-edit-form");
+          /*var form = Ext.get("datastream-edit-form");
           var tempUrl = window.location.toString();
           var index = tempUrl.indexOf('/fedora/repository');
           tempUrl = tempUrl.substr(0,index)+'/fedora/repository/'+ContentModelViewer.properties.pids.focused;
@@ -108,7 +97,7 @@ Ext.onReady(function(){
           action.set({
             value: 'ingest'
           });
-          document.forms["datastream-edit-form"].submit();
+          document.forms["datastream-edit-form"].submit();*/
         }
       }]
     },  {
@@ -124,7 +113,7 @@ Ext.onReady(function(){
       dock: 'bottom',
       displayInfo: true
     }],
-    items: [{
+    /*items: [{
       xtype: 'dataview',
       store: Ext.data.StoreManager.lookup('members'),
       itemSelector: 'div.x-dataview-item',
@@ -174,7 +163,7 @@ Ext.onReady(function(){
             var pid = record.get('pid');
             var isCollection = record.get('isCollection');
             func.setFocusedPid(pid, isCollection);
-          }*/
+          }*
         },
         itemdblclick: function(view, record) {
           var pid = record.get('pid');
@@ -188,9 +177,151 @@ Ext.onReady(function(){
           }
           else {
             func.setCollectionPid(pid, isCollection);
-          }*/
+          }*
         }
       }
-    }]
+    }]*/
   });
+});
+
+var sorter = (function() {
+  var type = 0;
+  var types = ['label', 'created'];
+  var direction = 0;
+  var directions = ['ASC', 'DESC'];
+  var labels = ['Label', 'Date Created'];
+  return {
+    toggleType: function() {
+      type = type ? 0 : 1;
+    },
+    toggleDirection: function() {
+      direction = direction ? 0: 1;
+    },
+    type: function() {
+      return types[type];
+    },
+    label: function() {
+      return labels[type];
+    },
+    direction: function() {
+      return directions[direction];
+    },
+    refresh: function() {
+      var store = Ext.data.StoreManager.lookup('members');
+      store.sorters.clear();
+      store.sorters.add(new Ext.util.Sorter({
+        property: this.type(),
+        direction: this.direction()
+      }));
+      store.load();
+    }
+  };
+})();
+
+
+Ext.define('ContentModelViewer.widgets.CollectionDataView', {
+  extend: 'Ext.view.View',
+  itemId: 'collectiondataview',
+  itemSelector: 'div.x-dataview-item',
+  emptyText: 'No Files Available',
+  deferEmptyText: false,
+  itemTpl: new Ext.XTemplate(
+    '<tpl for=".">',
+    ' <tpl if="originalMetadata">',
+    '  <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} unedited">',
+    '   <span style="float:left;text-align:center">',
+    '    <img class="member-item-img" src="{tn}"></img>',
+    '   </span>',
+    '   <div class="member-item-label">{label}</div>',
+    '  </div>',
+    ' </tpl>',
+    ' <tpl if="!originalMetadata">',
+    '  <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} edited">',
+    '   <span style="float:left;text-align:center">',
+    '    <img class="member-item-img" src="{tn}"></img>',
+    '   </span>',
+    '   <div class="member-item-label">{label}</div>',
+    '  </div>',
+    ' </tpl>',
+    '</tpl>',
+    {
+      compiled: true,
+      disableFormats: true,
+      getLabel: function(label) {
+        var empty = jQuery.trim(label) == '';
+        return empty ? 'Default Label: (Please notify an administrator to provide a label)' : label;
+      },
+      isUnedited: function(originalMetadata) {
+        return originalMetadata;
+      }
+    }
+  ),
+  setPid: function(pid) {
+    this.pid = pid;
+    this.store.setProxy({
+      type: 'ajax',
+      url: ContentModelViewer.properties.url.object.members(pid),
+      reader: {
+        type: 'json',
+        root: 'data'
+      }
+    });
+    this.store.load();
+  },
+  constructor: function(config) {
+    this.callParent(arguments);
+    this.store = Ext.create('Ext.data.Store', {
+      storeId: 'members',
+      model: ContentModelViewer.models.FedoraObject,
+      autoLoad: true,
+      autoSync: true,
+      pageSize: 20,
+      remoteSort: true,
+      remoteFilter: true,
+      sorters: [{
+        property : 'label',
+        direction: 'ASC'
+      }],
+      filters: [{
+        property: 'label',
+        value: null
+      }],
+      proxy: {
+        type: 'ajax',
+        url : ContentModelViewer.properties.url.object.members(config.pid),
+        reader: {
+          type: 'json',
+          root: 'data'
+        }
+      }
+    });
+  }
+});
+
+Ext.define('ContentModelViewer.widgets.CollectionPanel', {
+  extend: 'Ext.panel.Panel',
+  id: 'collectionpanel',
+  itemId: 'collection',
+  title: 'Resources',
+  constructor: function(config) {
+    this.callParent(arguments);
+    this.add(Ext.create('ContentModelViewer.widgets.CollectionDataView', { pid: config.pid }));
+    this.addDocked(Ext.create('Ext.toolbar.Paging', { store: this.getComponent('collectiondataview').getStore(), dock: 'top', displayInfo: true }));
+  },
+ /*,  {
+     id: 'collection-pager-top',
+     xtype: 'pagingtoolbar',
+     store: Ext.data.StoreManager.lookup('members'),   // same store GridPanel is using
+     dock: 'top',
+     displayInfo: true
+     }, {
+     id: 'collection-pager-bottom',
+     xtype: 'pagingtoolbar',
+     store: Ext.data.StoreManager.lookup('members'),   // same store GridPanel is using
+     dock: 'bottom',
+     displayInfo: true
+     }],*/
+  setPid: function(pid) {
+    //this.dataview.setPid(pid);
+  }
 });

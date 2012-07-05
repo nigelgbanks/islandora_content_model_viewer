@@ -58,7 +58,7 @@ Ext.onReady(function(){
   }*/
 
   // Create container for Application
-  ContentModelViewer.container =  Ext.create('Ext.container.Container', {
+  ContentModelViewer.container =  Ext.create('Ext.container.Viewport', {
     renderTo: 'content-model-viewer',
     height: 832,
     width: 920,

@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  *
@@ -26,7 +24,37 @@ function content_model_viewer_update_6000(&$sandbox) {
 }
 
 /**
- * Implementation of hook_install.
+ * Implements hook_requirements().
+ */
+function content_model_viewer_requirements($phase) {
+  module_load_include('inc', 'extjs', 'extjs.utils');
+  if($phase != 'install') {
+    return;
+  }
+  $t = get_t();
+  $requirements = array(
+    'content_model_viewer' => array('title' => $t('ExtJS Library'))
+  );
+  $version = extjs_get_version();
+  if (version_compare($version, '4.1.0') >= 0) {
+    $requirements['content_model_viewer']['severity'] = REQUIREMENT_OK;
+    $requirements['content_model_viewer']['value'] = $version;
+  }
+  else {
+    $requirements['content_model_viewer']['severity'] = REQUIREMENT_ERROR;
+    $requirements['content_model_viewer']['value'] = $version;
+    $requirements['content_model_viewer']['description'] = $t('The <a href="@yui">Content Model Viewer</a> plugin requires ExtJS library version 4.1.0 or higher. <a href="@download">Download</a> and extract it into the <code>@directory</code> directory. Rename the extracted folder to <code>@library-folder</code>.', array(
+      '@extjs' => 'http://www.sencha.com/',
+      '@download' => 'http://www.sencha.com/products/extjs/download?page=a',
+      '@directory' => 'sites/all/libraries',
+      '@library-folder' => 'extjs')
+    );
+  }
+  return $requirements;
+}
+
+/**
+ * Implementation of hook_install().
  */
 function content_model_viewer_install() {
   drupal_install_schema('content_model_viewer');
@@ -43,8 +71,8 @@ function content_model_viewer_uninstall() {
 }
 
 /**
- * Adds foreign key constraints for all settings tables. 
- * 
+ * Adds foreign key constraints for all settings tables.
+ *
  * On Delete of a Settings all tables with foreign key constrains will cascade the deletes.
  */
 function content_model_viewer_add_foreign_key_constraints() {
@@ -71,7 +99,7 @@ EOT;
 }
 
 /**
- * Add the default settings model, this should not be removed from the database, unless the module 
+ * Add the default settings model, this should not be removed from the database, unless the module
  * is being uninstalled.
  */
 function content_model_viewer_add_default_settings() {
@@ -109,7 +137,7 @@ function content_model_viewer_set_default_rules() {
 
 /**
  * Implementation of hook_schema.
- * 
+ *
  * @return array
  */
 function content_model_viewer_schema() {

@@ -1,0 +1,319 @@
+.orgCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/org.png");
+  width: 16px
+}
+
+.x-grid-tree-node-expanded .orgCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/org.png");
+  width: 16px
+}
+
+.organizationCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/org.png");
+  width: 16px
+}
+
+.x-grid-tree-node-expanded .organizationCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/org.png");
+  width: 16px;
+}
+
+.cameraTrapCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/films.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .cameraTrapCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/films.png");
+  width: 16px;
+}
+
+.cameraTrapDeploymentCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film--arrow.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .cameraTrapDeploymentCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film--arrow.png");
+  width: 16px;
+}
+
+
+.cameraTrapImageCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .cameraTrapImageCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film.png");
+  width: 16px;
+}
+
+.collectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/photo-album-blue.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .collectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/photo-album-blue.png");
+  width: 16px;
+}
+
+.ctCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/films.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .ctCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/films.png");
+  width: 16px;
+}
+
+.ctPlotCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film--pencil.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .ctPlotCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/film--pencil.png");
+  width: 16px;
+}
+
+.datasetCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/disk-return-black.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .datasetCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/disk-return-black.png");
+  width: 16px;
+}
+
+.expeditionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/globe-green.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .expeditionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/globe-green.png");
+  width: 16px;
+}
+
+.fbCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/notebooks.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .fbCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/notebooks.png");
+  width: 16px;
+}
+
+.fieldbookCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/notebook--pencil.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .fieldbookCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/notebook--pencil.png");
+  width: 16px;
+}
+
+.peopleCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/users.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .peopleCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/users.png");
+  width: 16px;
+}
+
+.peopleCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/user.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .peopleCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/user.png");
+  width: 16px;
+}
+
+.orgCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/building.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .orgCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/building.png");
+  width: 16px;
+}
+
+.ncdCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/grid-dot.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .ncdCollectionCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/grid-dot.png");
+  width: 16px;
+}
+
+.projectCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/blueprint.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .projectCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/blueprint.png");
+  width: 16px;
+}
+
+.imageCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/picture.png");
+  width: 16px;
+}
+
+.x-grid-tree-node-expanded .imageCModel
+{
+  background-image: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/picture.png");
+  width: 16px;
+}
+
+
+a.islandora-repo-button,
+a.islandora-repo-button:link
+{
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #f9f9f9), color-stop(1, #e9e9e9) );
+	background:-moz-linear-gradient( center top, #f9f9f9 5%, #e9e9e9 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f9f9f9', endColorstr='#e9e9e9');
+	background-color:#f9f9f9;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	border:1px solid #dcdcdc;
+
+	display:inline-block;
+	color:#555;
+	font-family:arial;
+	font-size:12px;
+	font-weight:normal;
+	padding: 4px 15px;
+	margin: 0px 10px 0px 0px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #ffffff;
+}
+
+a.islandora-repo-button:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #e9e9e9), color-stop(1, #f9f9f9) );
+	background:-moz-linear-gradient( center top, #e9e9e9 5%, #f9f9f9 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#e9e9e9', endColorstr='#f9f9f9');
+	background-color:#e9e9e9;
+	color: #222;
+}
+
+div.parentLink {
+  float: left;
+  width: 100%;
+  margin: 5px 0px 5px 0px;
+  background: #f4f4f4;
+  font-size: 1em;
+  font-weight: normal;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-radius: 4px 4px 4px 4px;
+  min-height: 20px;
+}
+
+div.parentLink a.content-model-viewer-parent-link,
+div.parentLink a.content-model-viewer-parent-link:link
+{
+    display: inline;
+    width: 100%;
+    padding: 6px 0px 5px 30px;
+    line-height: 2;
+    color: #555555;
+    background: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/folder.gif") 8px 5px no-repeat transparent;
+}
+div.parentLink a.content-model-viewer-parent-link:hover {
+    color: #212121;
+    border-color: #777;
+    outline: medium none;
+    background: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/tree/folder-open.gif") 8px 5px no-repeat transparent;
+    cursor: pointer;
+}
+div.parentLink a.content-model-viewer-remove-parent-link
+{
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 20px 5px 5px 30px;
+    background: url("/sites/all/modules/content_model_viewer/lib/ext/resources/themes/images/gray/dd/drop-no.gif") 8px 5px no-repeat transparent;
+}
+
+
+
+
+
+/* EXT-JS center body wrapper */
+
+.extjs-center-panel
+{
+  padding: 10px;
+}
+
+/* Table inside of EXT-JS center */
+.extjs-center-panel table,
+.extjs-center-panel table
+{
+  border: 1px solid #ccc;
+}
+
+.extjs-center-panel table caption
+{
+  font-weight: bold;
+  padding: 5px;
+}
+
+tr.even, tr.odd, tbody th {
+  border: solid #d3e7f4;
+  border-width: 1px 0;
+}
