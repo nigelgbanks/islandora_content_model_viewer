@@ -1,4 +1,4 @@
-Ext.onReady(function(){
+/*Ext.onReady(function(){
   var sorter = (function() {
     var type = 0;
     var types = ['label', 'created'];
@@ -97,7 +97,7 @@ Ext.onReady(function(){
           action.set({
             value: 'ingest'
           });
-          document.forms["datastream-edit-form"].submit();*/
+          document.forms["datastream-edit-form"].submit();
         }
       }]
     },  {
@@ -180,9 +180,9 @@ Ext.onReady(function(){
           }*
         }
       }
-    }]*/
+    }]*
   });
-});
+});*/
 
 var sorter = (function() {
   var type = 0;
@@ -225,6 +225,7 @@ Ext.onReady(function(){
 	  itemSelector: 'div.x-dataview-item',
 	  emptyText: 'No Files Available',
 	  deferEmptyText: false,
+    deferInitialRefresh: false,
 	  itemTpl: new Ext.XTemplate(
 		  '<tpl for=".">',
 		  ' <tpl if="originalMetadata">',
@@ -279,11 +280,6 @@ Ext.onReady(function(){
 		  });
 		  this.store.load();
 	  },
-    refresh: function() {
-      if(!this.store.isLoading()) {
-        this.store.load();
-      }
-    },
 	  constructor: function(config) {
 		  this.callParent(arguments);
 		  this.bindStore(Ext.create('Ext.data.Store', {
@@ -321,13 +317,13 @@ Ext.onReady(function(){
 	  constructor: function(config) {
 		  this.callParent(arguments);
 		  this.add(Ext.create('ContentModelViewer.widgets.CollectionDataView', { pid: config.pid }));
-		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: this.getComponent('collectiondataview').getStore(), dock: 'top', displayInfo: true }));
+		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: this.getComponent('collectiondataview').getStore(), dock: 'top', displayInfo: true, itemId: 'pager' }));
 	  },
 	  setPid: function(pid) {
 		  this.getComponent('collectiondataview').setPid(pid);
 	  },
     refresh: function() {
-      this.getComponent('collectiondataview').refresh();
+      this.getDockedComponent('pager').doRefresh();
     }
   });
 });
