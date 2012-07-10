@@ -6,7 +6,7 @@
  */
 
 /**
- * 
+ *
  */
 class Collection {
   /**
@@ -21,22 +21,22 @@ class Collection {
 
   /**
    * The pid of this Collection.
-   * 
+   *
    * @var string
    */
   protected $pid;
 
   /**
    * Named default properties.
-   * 
+   *
    * @var array
    */
   protected $default;
 
   /**
-   * Determines if the given pid is a Collection. An object is considered a 
+   * Determines if the given pid is a Collection. An object is considered a
    * collection if it's model is self::COLLECTION_MODEL or its parent model has this as a model.
-   * 
+   *
    * @return boolean
    *   TRUE if the given object is a Collection FALSE otherwise.
    */
@@ -50,15 +50,15 @@ class Collection {
 
   /**
    * Given the objects Model and Parent Models determine if its a Collection object.
-   * 
+   *
    * @param string $model
-   * 
+   *
    * @return boolean
    *   TRUE if this is a collection object FALSE otherwise.
    */
   private static function isModelCollection($model) {
     /**
-     * Is a islandora:collectionCModel or is a 
+     * Is a islandora:collectionCModel or is a
      * immediate decendant of a child of islandora:collectionCModel
      */
     return ($model == self::COLLECTION_MODEL || self::isParentModelCollection($model));
@@ -66,9 +66,9 @@ class Collection {
 
   /**
    * Determines if one of the parent models of the given model are collection objects.
-   * 
-   * @param string $model 
-   * 
+   *
+   * @param string $model
+   *
    * @return boolean
    *   TRUE if this model's parent model is a collection object FALSE otherwise.
    */
@@ -87,8 +87,8 @@ class Collection {
 
   /**
    * Create a Collection class.
-   * 
-   * @param string $pid 
+   *
+   * @param string $pid
    */
   public function __construct($pid) {
     $this->pid = $pid;
@@ -106,7 +106,7 @@ class Collection {
 
   /**
    * Looks at POST data for properties and lists all members based on those properties.
-   * 
+   *
    * @return array
    */
   public function getMembers() {
@@ -124,38 +124,58 @@ class Collection {
 
   public function getTreeMembers() {
     $query = 'select $object $title $model $created $parent_model
-    count(
-      select $pid
-      from <#ri>
-      where  $object <fedora-model:hasModel> $sub_model
-    and $sub_model <fedora-model:hasModel> $sub_parent_model
-    and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($pid <fedora-rels-ext:isMemberOfCollection> $object
-      or $pid <fedora-rels-ext:isMemberOf> $object )
+    count(select $pid from <#ri> where $object <fedora-model:hasModel> $sub_model
+     and $sub_model <fedora-model:hasModel> $sub_parent_model
+     and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+     and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+     and ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object)
     )
-    from <#ri>
-    where ($object <info:fedora/fedora-system:def/model#label> $title
-    and $object <fedora-model:hasModel> $model
-    and $model <fedora-model:hasModel> $parent_model
-    and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-    and $object <fedora-model:createdDate> $created
-    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-    or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-    minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-    minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-    minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-    order by $title';
+    from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
+     and $object <fedora-model:hasModel> $model
+     and $model <fedora-model:hasModel> $parent_model
+     and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+     and $object <fedora-model:createdDate> $created
+     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+     and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
+     or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
+     minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+     minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+     minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+     order by $title';
     $results = $this->query($query);
     $results = $this->populate($results);
     return $results;
   }
 
+  public function getChildCount($pid) {
+    $query = 'select $object $title count(select $pid from <#ri> where $object <fedora-model:hasModel> $sub_model and $sub_model <fedora-model:hasModel> $sub_parent_model
+              and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel> and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+              and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active> and
+              ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object ))
+              from <#ri> where ($object <mulgara:is>  <info:fedora/' . $pid . '> and $object <info:fedora/fedora-system:def/model#label> $title)';
+    module_load_include('inc', 'fedora_repository', 'CollectionClass');
+    $collection = new CollectionClass();
+    $results = $collection->getRelatedObjects($pid, 1000000, NULL, $query);
+    $results = trim($results);
+    error_log($pid);
+    if ($results != '') {
+      $document = new DOMDocument();
+      $document->loadXML($results);
+      $path = new DOMXPath($document);
+      $path->registerNamespace('sparql', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
+      $results = $path->query('//sparql:result');
+      $label = $this->getQueryResultValue('sparql:title', $results->item(0), $path);
+      $count = $this->getQueryResultValue('sparql:k0', $results->item(0), $path);
+      return array($label, $count);
+    }
+    return array();
+  }
+
   /**
    *
    * @param type $pid
-   * @return type 
+   * @return type
    */
   public function getParent($pid) {
     $results = $this->findParent($pid);
@@ -171,7 +191,7 @@ class Collection {
 
   /**
    * Runs a SPARQL query and returns the results in a array.
-   * 
+   *
    * @return array
    */
   private function findParent($pid) {
@@ -189,7 +209,7 @@ class Collection {
   }
 
   private function findParents($pid) {
-    $query = 'select $subject $object from <#ri> 
+    $query = 'select $subject $object from <#ri>
                             where walk(<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
                             and $subject <fedora-rels-ext:isMemberOfCollection> $object)';
     return $this->query($query);
@@ -197,7 +217,7 @@ class Collection {
 
   /**
    * Runs a SPARQL query and returns the results in a array.
-   * 
+   *
    * @return array
    */
   private function findMembers() {
@@ -229,10 +249,10 @@ class Collection {
 
   /**
    * Launch a SPARQL query. Returns all members found up to 1,000,000 results.
-   * 
+   *
    * @param string $query
    *   SPARQL query.
-   * 
+   *
    * @return array
    */
   private function query($query) {
@@ -254,9 +274,9 @@ class Collection {
 
   /**
    * Process the returned query results and generate the appropriate array of values for each result.
-   * 
-   * @param array $results 
-   * 
+   *
+   * @param array $results
+   *
    * @return array
    */
   private function processQueryResults(DOMNodeList $results, DOMXPath $path) {
@@ -270,10 +290,10 @@ class Collection {
 
   /**
    * Processes a single query result returning some basic properties for the object.
-   * 
+   *
    * @param DOMNode $result
    * @param DOMXPath $path
-   * 
+   *
    * @return array
    *   Basic properties of the object/query result.
    */
@@ -292,7 +312,7 @@ class Collection {
    *
    * @param string $field
    * @param DOMNode $result
-   * @param DOMXPath $path 
+   * @param DOMXPath $path
    */
   private function getQueryResultValue($field, DOMNode $result, DOMXPath $path) {
     $results = $path->query($field, $result);
@@ -310,10 +330,10 @@ class Collection {
 
   /**
    * Filter the results based on the search string.
-   * 
+   *
    * @param array $results
    * @param string $search
-   * 
+   *
    * @return array
    */
   private function filter(array $results, $filter) {
@@ -333,10 +353,10 @@ class Collection {
 
   /**
    * Sort the results.
-   * 
+   *
    * @param array $results
    * @param string $sort
-   * 
+   *
    * @return array
    */
   private function sort(array $results, $sort) {
@@ -364,10 +384,10 @@ class Collection {
 
   /**
    * Sort by the title in ascending order.
-   * 
+   *
    * @param string $a
    * @param string $b
-   * 
+   *
    * @return boolean
    */
   private function alpha_asc_sort($a, $b) {
@@ -376,10 +396,10 @@ class Collection {
 
   /**
    * Sort by the title in descending order.
-   * 
+   *
    * @param string $a
    * @param string $b
-   * 
+   *
    * @return boolean
    */
   private function alpha_desc_sort($a, $b) {
@@ -388,10 +408,10 @@ class Collection {
 
   /**
    * Sort by the creation date from newest to oldest.
-   * 
+   *
    * @param string $a
    * @param string $b
-   * 
+   *
    * @return boolean
    */
   private function date_newest_sort($a, $b) {
@@ -405,10 +425,10 @@ class Collection {
 
   /**
    * Sort by the creation date from oldest to newest.
-   * 
+   *
    * @param string $a
    * @param string $b
-   * 
+   *
    * @return boolean
    */
   private function date_oldest_sort($a, $b) {
@@ -422,11 +442,11 @@ class Collection {
 
   /**
    * Limit the results to a given range.
-   * 
+   *
    * @param array $results
    * @param integer $offset
    * @param integer $limit
-   * 
+   *
    * @return array
    */
   private function limit(array $results, $offset, $limit) {
@@ -437,9 +457,9 @@ class Collection {
 
   /**
    * Fills out properties for each object.
-   * 
+   *
    * @param array $results
-   * 
+   *
    * @return array
    */
   private function populate($results, $show_type = FALSE) {
@@ -461,7 +481,7 @@ class Collection {
   /**
    *
    * @param type $type
-   * @param type $pid 
+   * @param type $pid
    */
   private function getThumbnail($pid, $type = 'Text') {
     $module_path = drupal_get_path('module', 'content_model_viewer');
@@ -489,7 +509,7 @@ class Collection {
   /**
    *
    * @param type $pid
-   * @return type 
+   * @return type
    */
   private function getType($pid) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
@@ -530,7 +550,7 @@ class Collection {
   /**
    *
    * @param type $type
-   * @param type $pid 
+   * @param type $pid
    */
   private function isMetadataOriginal($pid) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
@@ -555,10 +575,10 @@ class Collection {
 
   /**
    * Attempts to get the description from the objects DC datastream.
-   * 
-   * @param string $pid 
+   *
+   * @param string $pid
    *   The Fedora Object.
-   * 
+   *
    * @return string
    *   The description from the objects DC if possible, otherwise a default description is returned.
    */
@@ -590,9 +610,9 @@ class Collection {
 
   /**
    * Get Content Model Pid.
-   * 
+   *
    * @param string $pid
-   * 
+   *
    * @return string
    */
   private function getContentModelPid($pid) {

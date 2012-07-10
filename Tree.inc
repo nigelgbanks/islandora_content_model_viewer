@@ -74,7 +74,7 @@ class Tree {
    *
    * @return string
    */
-  private function buildTree($pid) {
+  public function buildTree($pid) {
     module_load_include('inc', 'content_model_viewer', 'Collection');
     $collection = new Collection($pid);
     $members = $collection->getTreeMembers();

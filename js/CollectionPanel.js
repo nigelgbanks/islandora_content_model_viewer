@@ -218,110 +218,116 @@ var sorter = (function() {
   };
 })();
 
-
-Ext.define('ContentModelViewer.widgets.CollectionDataView', {
-  extend: 'Ext.view.View',
-  itemId: 'collectiondataview',
-  itemSelector: 'div.x-dataview-item',
-  emptyText: 'No Files Available',
-  deferEmptyText: false,
-  itemTpl: new Ext.XTemplate(
-    '<tpl for=".">',
-    ' <tpl if="originalMetadata">',
-    '  <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} unedited">',
-    '   <span style="float:left;text-align:center">',
-    '    <img class="member-item-img" src="{tn}"></img>',
-    '   </span>',
-    '   <div class="member-item-label">{label}</div>',
-    '  </div>',
-    ' </tpl>',
-    ' <tpl if="!originalMetadata">',
-    '  <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} edited">',
-    '   <span style="float:left;text-align:center">',
-    '    <img class="member-item-img" src="{tn}"></img>',
-    '   </span>',
-    '   <div class="member-item-label">{label}</div>',
-    '  </div>',
-    ' </tpl>',
-    '</tpl>',
-    {
-      compiled: true,
-      disableFormats: true,
-      getLabel: function(label) {
-        var empty = jQuery.trim(label) == '';
-        return empty ? 'Default Label: (Please notify an administrator to provide a label)' : label;
-      },
-      isUnedited: function(originalMetadata) {
-        return originalMetadata;
+Ext.onReady(function(){
+  Ext.define('ContentModelViewer.widgets.CollectionDataView', {
+	  extend: 'Ext.view.View',
+	  itemId: 'collectiondataview',
+	  itemSelector: 'div.x-dataview-item',
+	  emptyText: 'No Files Available',
+	  deferEmptyText: false,
+	  itemTpl: new Ext.XTemplate(
+		  '<tpl for=".">',
+		  ' <tpl if="originalMetadata">',
+		  '	 <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} unedited">',
+		  '		<span style="float:left;text-align:center">',
+		  '		 <img class="member-item-img" src="{tn}"></img>',
+		  '		</span>',
+		  '		<div class="member-item-label">{label}</div>',
+		  '	 </div>',
+		  ' </tpl>',
+		  ' <tpl if="!originalMetadata">',
+		  '	 <div class="member-item {[xindex % 2 === 0 ? "even" : "odd"]} edited">',
+		  '		<span style="float:left;text-align:center">',
+		  '		 <img class="member-item-img" src="{tn}"></img>',
+		  '		</span>',
+		  '		<div class="member-item-label">{label}</div>',
+		  '	 </div>',
+		  ' </tpl>',
+		  '</tpl>',
+		  {
+			  compiled: true,
+			  disableFormats: true,
+			  getLabel: function(label) {
+				  var empty = jQuery.trim(label) == '';
+				  return empty ? 'Default Label: (Please notify an administrator to provide a label)' : label;
+			  },
+			  isUnedited: function(originalMetadata) {
+				  return originalMetadata;
+			  }
+		  }
+	  ),
+	  listeners: {
+		  selectionchange: function(view, selections, options) {
+			  var record = selections[0];
+			  if(record) {
+				  ContentModelViewer.functions.selectResource(record.get('pid'));
+			  }
+		  },
+		  itemdblclick: function(view, record) {
+			  ContentModelViewer.functions.selectResource(record.get('pid'));
+		  }
+	  },
+	  setPid: function(pid) {
+		  this.pid = pid;
+		  this.store.setProxy({
+			  type: 'ajax',
+			  url: ContentModelViewer.properties.url.object.members(pid),
+			  reader: {
+				  type: 'json',
+				  root: 'data'
+			  }
+		  });
+		  this.store.load();
+	  },
+    refresh: function() {
+      if(!this.store.isLoading()) {
+        this.store.load();
       }
+    },
+	  constructor: function(config) {
+		  this.callParent(arguments);
+		  this.bindStore(Ext.create('Ext.data.Store', {
+			  model: ContentModelViewer.models.FedoraObject,
+			  autoLoad: true,
+			  autoSync: true,
+			  pageSize: 20,
+			  remoteSort: true,
+			  remoteFilter: true,
+			  sorters: [{
+				  property : 'label',
+				  direction: 'ASC'
+			  }],
+			  filters: [{
+				  property: 'label',
+				  value: null
+			  }],
+			  proxy: {
+				  type: 'ajax',
+				  url : ContentModelViewer.properties.url.object.members(config.pid),
+				  reader: {
+					  type: 'json',
+					  root: 'data'
+				  }
+			  }
+		  }));
+	  }
+  });
+
+  Ext.define('ContentModelViewer.widgets.CollectionPanel', {
+	  extend: 'Ext.panel.Panel',
+	  id: 'collectionpanel',
+	  itemId: 'collection',
+	  title: 'Resources',
+	  constructor: function(config) {
+		  this.callParent(arguments);
+		  this.add(Ext.create('ContentModelViewer.widgets.CollectionDataView', { pid: config.pid }));
+		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: this.getComponent('collectiondataview').getStore(), dock: 'top', displayInfo: true }));
+	  },
+	  setPid: function(pid) {
+		  this.getComponent('collectiondataview').setPid(pid);
+	  },
+    refresh: function() {
+      this.getComponent('collectiondataview').refresh();
     }
-  ),
-  setPid: function(pid) {
-    this.pid = pid;
-    this.store.setProxy({
-      type: 'ajax',
-      url: ContentModelViewer.properties.url.object.members(pid),
-      reader: {
-        type: 'json',
-        root: 'data'
-      }
-    });
-    this.store.load();
-  },
-  constructor: function(config) {
-    this.callParent(arguments);
-    this.store = Ext.create('Ext.data.Store', {
-      storeId: 'members',
-      model: ContentModelViewer.models.FedoraObject,
-      autoLoad: true,
-      autoSync: true,
-      pageSize: 20,
-      remoteSort: true,
-      remoteFilter: true,
-      sorters: [{
-        property : 'label',
-        direction: 'ASC'
-      }],
-      filters: [{
-        property: 'label',
-        value: null
-      }],
-      proxy: {
-        type: 'ajax',
-        url : ContentModelViewer.properties.url.object.members(config.pid),
-        reader: {
-          type: 'json',
-          root: 'data'
-        }
-      }
-    });
-  }
-});
-
-Ext.define('ContentModelViewer.widgets.CollectionPanel', {
-  extend: 'Ext.panel.Panel',
-  id: 'collectionpanel',
-  itemId: 'collection',
-  title: 'Resources',
-  constructor: function(config) {
-    this.callParent(arguments);
-    this.add(Ext.create('ContentModelViewer.widgets.CollectionDataView', { pid: config.pid }));
-    this.addDocked(Ext.create('Ext.toolbar.Paging', { store: this.getComponent('collectiondataview').getStore(), dock: 'top', displayInfo: true }));
-  },
- /*,  {
-     id: 'collection-pager-top',
-     xtype: 'pagingtoolbar',
-     store: Ext.data.StoreManager.lookup('members'),   // same store GridPanel is using
-     dock: 'top',
-     displayInfo: true
-     }, {
-     id: 'collection-pager-bottom',
-     xtype: 'pagingtoolbar',
-     store: Ext.data.StoreManager.lookup('members'),   // same store GridPanel is using
-     dock: 'bottom',
-     displayInfo: true
-     }],*/
-  setPid: function(pid) {
-    //this.dataview.setPid(pid);
-  }
+  });
 });

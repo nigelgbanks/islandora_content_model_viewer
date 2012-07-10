@@ -1,29 +1,37 @@
-/* 
+/*
     Document   : Clear.css
     Created on : Apr 6, 2011, 1:38:25 PM
     Author     : nbanks
     Description:
         Purpose of the stylesheet follows.
 */
-#content-model-viewer ol, #content-model-viewer ul {
-    list-style: none;
+
+/**
+ * System.css HTML elements resets
+ */
+tbody {
+  border-top: none;
 }
-#content-model-viewer a:link {
-    padding-bottom: 0px;
+tbody th {
+  border-bottom: none;
 }
-#content-model-viewer table, .adr-clear table, .x-window table{
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-}
-#content-model-viewer form tbody, #content-model-viewer form tbody th, .x-window th, .x-window td {
-    border: 0;
+thead th {
+  text-align: left; /* LTR */
+  padding-right: 1em; /* LTR */
+  border-bottom: none
 }
 
-.x-boundlist-item {
-  background: none;
+/**
+ * Default.css HTML elements resets
+ */
+tbody {
+  border-top: none;
+}
+tbody th {
+  border-bottom: none;
+}
+thead th {
+  text-align: left; /* LTR */
+  padding-right: 1em; /* LTR */
+  border-bottom: none
 }

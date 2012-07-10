@@ -7,18 +7,35 @@ Ext.onReady(function(){
     },
     constructor: function(config) {
       this.callParent(arguments);
+      this.pid = config.pid;
+      this.add(this.createContent(ContentModelViewer.properties.url.object.overview(config.pid)));
+      var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
+        region: 'east',
+        pid: config.pid
+      });
+      this.add(files);
+    },
+    createContent: function(url) {
       var loaded = new Array();
-      var url = ContentModelViewer.properties.url;
-      var content = Ext.create('Ext.panel.Panel', {
+      return Ext.create('Ext.panel.Panel', {
         html: '<div>Loading...</div>',
         itemId: 'content',
         autoScroll: true,
         region: 'center',
         loader: {
-          url: url.object.overview(config.pid),
+          url: url,
           renderer: function(loader, response, active) {
             var json = Ext.JSON.decode(response.responseText);
             loader.getTarget().update(json.data); // Update Panel
+            if(json.css.length > 0) {
+              for(var i = 0; i < json.css.length; i++) {
+                var file = json.css[i];
+                if($('head > link[href="' + file + '"]').length == 0 && $.inArray(file, loaded) < 0) {
+                  loaded.push(file);
+                  $("head").append("<link rel='stylesheet' type='text/css' href='" + file +"' />");
+                }
+              }
+            }
             if(json.js.length > 0) { // Load new JS files
               $.ajaxSetup({async:false});
               for(var i = 0; i < json.js.length; i++) {
@@ -42,26 +59,38 @@ Ext.onReady(function(){
           autoLoad: true
         }
       });
-      var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
-        region: 'east',
-        pid: config.pid
+    },
+    loadContent: function (url, params, success) {
+      var loader = this.getComponent('content').getLoader();
+      loader.clearListeners();
+      if(success) {
+        loader.addListener('load', success);
+      }
+      loader.load({
+        url: url,
+        params: params
       });
-      this.add(content);
-      this.add(files);
+    },
+    loadEditPermissionContent: function () {
+      this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid));
+    },
+    loadEditMetadataContent: function (form_selector, success) {
+      var params = {};
+      $('select, input', $(form_selector)).each(function() {
+        var name = $(this).attr('name');
+        if(name.length > 0) {
+          params[name] = $(this).attr('value');
+        }
+      });
+      this.loadContent(ContentModelViewer.properties.url.object.metadata_form(this.pid), params, success);
     },
     setPid: function(pid) {
       this.pid = pid;
       this.refresh();
     },
     refresh: function() {
-      var files = this.getComponent('files');
-      files.setPid(this.pid);
-      var content = this.getComponent('content');
-      var loader = content.getLoader();
-      var url = ContentModelViewer.properties.url;
-      loader.load({
-        url: url.object.overview(this.pid)
-      });
+      this.getComponent('files').setPid(this.pid);
+      this.loadContent(ContentModelViewer.properties.url.object.overview(this.pid));
     },
     itemId: 'overview',
     title: 'Overview',

@@ -25,7 +25,7 @@ ContentModelViewer.setup.initContentArea = function() {
  */
 ContentModelViewer.setup.initExtJSFeatures = function() {
   var expirationDateTime = new Date().getTime()+(1000*60*60*24*7); // 7 days from now
-  Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+  Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider', {
     expires: new Date(expirationDateTime)
   }));
   Ext.QuickTips.init();
@@ -67,8 +67,8 @@ ContentModelViewer.setup.initProperties = function() {
     var url = $(id).text();
     return function(pid, dsid) {
       var temp = url;
-      temp = temp.replace('/pid/', '/'+pid+'/');
-      return temp.replace('/dsid/', '/'+dsid+'/');
+      temp = temp.replace('/pid', '/'+pid);
+      return temp.replace('/dsid', '/'+dsid);
     }
   };
   // Set properties @todo get collection/focused from URL # if possible.
@@ -88,8 +88,12 @@ ContentModelViewer.setup.initProperties = function() {
       overview: url_replace_pid_func('#object_overview_url'),
       properties: url_replace_pid_func('#object_properties_url'),
       datastreams: url_replace_pid_func('#object_datastreams_url'),
+      permission_form: url_replace_pid_func('#object_permission_form_url'),
+      metadata_form: url_replace_pid_func('#object_metadata_form_url'),
       members: url_replace_pid_func('#object_members_url'),
       treemembers: url_replace_pid_func('#object_treemembers_url'),
+      treemember: url_replace_pid_func('#object_treemember_url'),
+      remove_relationship: url_replace_pid_dsid_func('#object_remove_relationship_url'),
       purge: url_replace_pid_func('#object_purge_url')
     },
     datastream: {
@@ -219,6 +223,29 @@ ContentModelViewer.setup.defineFunctions = function() {
         panel.setPid(pid);
       }
     },
+    loadResourceEditMetadataForm: function () {
+      var cmv = this;
+      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditMetadataContent('#resource-metadata-form', function(loader, response, options) {
+        if(response.responseText != undefined) {
+          var data = JSON.parse(response.responseText);
+          if(data.refresh) {
+            cmv.refreshResource();
+            cmv.refreshResources();
+          }
+        }
+      });
+    },
+    loadConceptEditMetadataForm: function () {
+      var cmv = this;
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadEditMetadataContent('#concept-metadata-form', function(loader, response, options) {
+        if(response.responseText != undefined) {
+          var data = JSON.parse(response.responseText);
+          if(data.refresh) {
+            cmv.refreshTreeNodes(data.refresh);
+          }
+        }
+      });
+    },
     //
     refreshConcept: function() {
       var panel = Ext.getCmp('cmvtabpanel').getComponent('concept-overview');
@@ -233,12 +260,19 @@ ContentModelViewer.setup.defineFunctions = function() {
         panel.refresh();
       }
     },
+    //
+    refreshResources: function() {
+      Ext.getCmp('collectionpanel').refresh();
+    },
+    refreshTreeNodes: function(pid) {
+      Ext.getCmp('cmvtreepanel').refreshNodes(pid);
+    },
     // Reloads the tree data.
-    refreshTree: function() {
-      var store = Ext.data.StoreManager.lookup('treemembers');
-      if(!store.isLoading()) {
-        Ext.data.StoreManager.lookup('treemembers').load();
-      }
+    refreshTree: function(pid) {
+      Ext.getCmp('cmvtreepanel').refreshChildren(pid);
+    },
+    refreshTreeParents: function(pid) {
+      Ext.getCmp('cmvtreepanel').refreshParents(pid);
     },
     //
     showConcept: function() {
@@ -505,6 +539,7 @@ ContentModelViewer.setup.createStores = function() {
 /**
  * Document Ready: Main
  */
+Ext.require('Ext.data.TreeStore');
 Ext.onReady(function(){
   // Local Variables
   var setup = ContentModelViewer.setup;

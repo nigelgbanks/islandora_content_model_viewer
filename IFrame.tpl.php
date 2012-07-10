@@ -1,9 +1,13 @@
 <html>
 <head>
-<link type="text/css" rel="stylesheet" media="all" href="/sites/all/libraries/extjs/resources/css/ext-all-gray.css">
-<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/smith.css">
-<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/ContentModelViewer.css">
- <?php print $scripts; ?>
+   <!--<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/defaults.css">
+   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/system.css">
+   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/libraries/extjs/resources/css/ext-all-gray.css">
+   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/smith.css">
+   <link type="text/css" rel="stylesheet"
+media="all"href="/sites/all/modules/content_model_viewer/css/ContentModelViewer.css"> -->
+   <?php print $styles; ?>
+   <?php print $scripts; ?>
 </head>
 <body>
 <div id="content-model-viewer" style="display:none;">
@@ -19,8 +23,12 @@
     <div id="object_overview_url"><?php print check_url(url($paths['object']['overview'])); ?></div>
     <div id="object_properties_url"><?php print check_url(url($paths['object']['properties'])); ?></div>
     <div id="object_datastreams_url"><?php print check_url(url($paths['object']['datastreams'])); ?></div>
+    <div id="object_permission_form_url"><?php print check_url(url($paths['object']['permission_form'])); ?></div>
+    <div id="object_metadata_form_url"><?php print check_url(url($paths['object']['metadata_form'])); ?></div>
     <div id="object_members_url"><?php print check_url(url($paths['object']['members'])); ?></div>
     <div id="object_treemembers_url"><?php print check_url(url($paths['object']['treemembers'])); ?></div>
+    <div id="object_treemember_url"><?php print check_url(url($paths['object']['treemember'])); ?></div>
+    <div id="object_remove_relationship_url"><?php print check_url(url($paths['object']['remove_relationship'])); ?></div>
     <div id="object_purge_url"><?php print check_url(url($paths['object']['purge'])); ?></div>
     <div id="datastream_add_url"><?php print check_url(url($paths['datastream']['add'])); ?></div>
     <div id="datastream_purge_url"><?php print check_url(url($paths['datastream']['purge'])); ?></div>
