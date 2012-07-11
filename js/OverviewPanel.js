@@ -117,16 +117,28 @@ Ext.onReady(function(){
       });
     },
     getFormParams: function (form_selector) {
+      var params = {};
       var form = $(form_selector);
       if(form.length) {
-        var params = JSON.parse('{"' + (form.serialize().replace(/\+/g, '%20')).replace(/&/g, "\",\"").replace(/=/g,"\":\"") + '"}');
-        for(key in params) {
-          var val = decodeURIComponent(params[key]);
-          delete params[key];
-          params[decodeURIComponent(key)] = val;
+        var serialized_form = form.serialize().replace(/\+/g, '%20');
+        var values = serialized_form.split('&');
+        for(i = 0; i < values.length; i++) {
+          var key_value_pair =  values[i].split('=');
+          var key = decodeURIComponent(key_value_pair[0]);
+          var value = decodeURIComponent(key_value_pair[1]);
+          if(params[key] === undefined) {
+            params[key] = value;
+          }
+          else if (typeof params[key] === 'string') {
+            params[key] = [params[key], value];
+          }
+          else {
+            params[key].push(value);
+          }
         }
-        return params;
       }
+      console.log(params);
+      return params;
     },
     loadEditPermissionContent: function (form_selector) {
       this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid), this.getFormParams(form_selector));
