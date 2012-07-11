@@ -704,7 +704,32 @@ function content_model_viewer_overview($pid) {
  * Show the edit permission form.
  */
 function content_model_viewer_permission_form($pid) {
-
+  $cmodels = content_model_viewer_get_cmodels($pid);
+  $id = in_array('islandora:collectionCModel', $cmodels) ? 'concept-permission-form' : 'resource-permission-form';
+  $form = drupal_get_form('islandora_xacml_editor_page', $pid, 'POLICY');
+  $data = "<div id='$id' class='drupal-content'>$form</div>";
+  $javascript = drupal_add_js(NULL, NULL, 'header');
+  $settings = $javascript['setting'];
+  if (isset($settings)) {
+    $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
+    unset($settings['ahah']['']);
+  }
+  $js = $javascript['module'];
+  $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
+  $files = array();
+  foreach($js as $path => $properties) {
+    $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
+  }
+  $css_files = array();
+  $css = content_model_viewer_grab_css();
+  foreach($css['all'] as $group) {
+    foreach($group as $path => $bool) {
+      $css_files[] = base_path() . $path . $query_string;
+    }
+  }
+  header("Content-type: application/json");
+  echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => NULL, 'settings' => $settings, 'js' => $files, 'css' => $css_files));
+  exit();
 }
 
 function content_model_viewer_get_cmodels($pid) {
@@ -742,14 +767,27 @@ function content_model_viewer_get_cmodels($pid) {
   return $ret;
 }
 
+function content_model_viewer_form_islandora_xacml_editor_page_alter(&$form, &$form_state) {
+  $form['pid'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_state['storage']['object_pid']
+  );
+  $form['#submit'][] = 'content_model_viewer_form_islandora_xacml_editor_page_submit';
+}
+
+function content_model_viewer_form_islandora_xacml_editor_page_submit($form, &$form_state) {
+  $pid = $form_state['values']['pid'];
+  $form_state['redirect'] = "viewer/{$pid}/overview";
+}
 /**
  * Show the metadata form.
  */
 function content_model_viewer_metadata_form($pid, $action = 'edit') {
   // If concept
+  error_log(print_r($_POST, TRUE));
   $cmodels = content_model_viewer_get_cmodels($pid);
   $id = in_array('islandora:collectionCModel', $cmodels) ? 'concept-metadata-form' : 'resource-metadata-form';
-  $data = theme('content_model_viewer_metadata_form', $id, $pid, $action);
+  $data = theme('content_model_viewer_metadata_form', $id, $pid, 'edit');
   $javascript = drupal_add_js(NULL, NULL, 'header');
   $settings = $javascript['setting'];
   if (isset($settings)) {
@@ -1183,7 +1221,7 @@ function content_model_viewer_edit_metadata_form_submit(array &$form, array &$fo
     $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
     drupal_set_message($msg, 'error');
   }
-  $form_state['redirect'] = "/viewer/{$form_state['values']['pid']}/overview";
+  $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
   $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
 }
 

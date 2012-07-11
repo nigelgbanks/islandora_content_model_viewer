@@ -225,7 +225,7 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     loadResourceEditMetadataForm: function () {
       var cmv = this;
-      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditMetadataContent('#resource-metadata-form', function(loader, response, options) {
+      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditMetadataContent('#resource-metadata-form form', function(loader, response, options) {
         if(response.responseText != undefined) {
           var data = JSON.parse(response.responseText);
           if(data.refresh) {
@@ -237,7 +237,7 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     loadConceptEditMetadataForm: function () {
       var cmv = this;
-      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadEditMetadataContent('#concept-metadata-form', function(loader, response, options) {
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadEditMetadataContent('#concept-metadata-form form', function(loader, response, options) {
         if(response.responseText != undefined) {
           var data = JSON.parse(response.responseText);
           if(data.refresh) {
@@ -245,6 +245,14 @@ ContentModelViewer.setup.defineFunctions = function() {
           }
         }
       });
+    },
+    //
+    loadResourceEditPermissionForm: function () {
+      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditPermissionContent('#resource-permission-form form');
+    },
+    //
+    loadConceptEditPermissionForm: function () {
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadEditPermissionContent('#concept-permission-form form');
     },
     //
     refreshConcept: function() {

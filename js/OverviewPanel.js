@@ -1,3 +1,6 @@
+
+
+
 Ext.onReady(function(){
   Ext.define('ContentModelViewer.widgets.OverviewPanel', {
     extend: 'Ext.panel.Panel',
@@ -8,6 +11,7 @@ Ext.onReady(function(){
     constructor: function(config) {
       this.callParent(arguments);
       this.pid = config.pid;
+      this.deparam = this.createParamDeserializer();
       this.add(this.createContent(ContentModelViewer.properties.url.object.overview(config.pid)));
       var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
         region: 'east',
@@ -60,6 +64,47 @@ Ext.onReady(function(){
         }
       });
     },
+    // Yanked from https://github.com/jupiterjs/jquerymx/blob/master/lang/string/deparam/deparam.js
+    createParamDeserializer: function() {
+      var digitTest = /^\d+$/,
+		  keyBreaker = /([^\[\]]+)|(\[\])/g,
+		  plus = /\+/g,
+		  paramTest = /([^?#]*)(#.*)?$/;
+		  return function(params){
+			  if(! params || ! paramTest.test(params) ) {
+				  return {};
+			  }
+			  var data = {},
+				pairs = params.split('&'),
+				current;
+			  for(var i=0; i < pairs.length; i++){
+				  current = data;
+				  var pair = pairs[i].split('=');
+				  // if we find foo=1+1=2
+				  if(pair.length != 2) {
+					  pair = [pair[0], pair.slice(1).join("=")]
+				  }
+          var key = decodeURIComponent(pair[0].replace(plus, " ")),
+          value = decodeURIComponent(pair[1].replace(plus, " ")),
+					parts = key.match(keyBreaker);
+				  for ( var j = 0; j < parts.length - 1; j++ ) {
+					  var part = parts[j];
+					  if (!current[part] ) {
+						  // if what we are pointing to looks like an array
+						  current[part] = digitTest.test(parts[j+1]) || parts[j+1] == "[]" ? [] : {}
+					  }
+					  current = current[part];
+				  }
+				  lastPart = parts[parts.length - 1];
+				  if(lastPart == "[]") {
+					  current.push(value)
+				  } else{
+					  current[lastPart] = value;
+				  }
+			  }
+			  return data;
+		  }
+	  },
     loadContent: function (url, params, success) {
       var loader = this.getComponent('content').getLoader();
       loader.clearListeners();
@@ -71,18 +116,23 @@ Ext.onReady(function(){
         params: params
       });
     },
-    loadEditPermissionContent: function () {
-      this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid));
+    getFormParams: function (form_selector) {
+      var form = $(form_selector);
+      if(form.length) {
+        var params = JSON.parse('{"' + (form.serialize().replace(/\+/g, '%20')).replace(/&/g, "\",\"").replace(/=/g,"\":\"") + '"}');
+        for(key in params) {
+          var val = decodeURIComponent(params[key]);
+          delete params[key];
+          params[decodeURIComponent(key)] = val;
+        }
+        return params;
+      }
+    },
+    loadEditPermissionContent: function (form_selector) {
+      this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid), this.getFormParams(form_selector));
     },
     loadEditMetadataContent: function (form_selector, success) {
-      var params = {};
-      $('select, input', $(form_selector)).each(function() {
-        var name = $(this).attr('name');
-        if(name.length > 0) {
-          params[name] = $(this).attr('value');
-        }
-      });
-      this.loadContent(ContentModelViewer.properties.url.object.metadata_form(this.pid), params, success);
+      this.loadContent(ContentModelViewer.properties.url.object.metadata_form(this.pid), this.getFormParams(form_selector), success);
     },
     setPid: function(pid) {
       this.pid = pid;
