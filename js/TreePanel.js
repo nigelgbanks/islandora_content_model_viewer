@@ -33,6 +33,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   loadNodes: function(nodes) {
     for(var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
+      this.refreshNodes(node.get('pid'));
       this.store.load({ node: node, url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root) });
     }
   },
