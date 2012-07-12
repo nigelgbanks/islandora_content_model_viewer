@@ -11,8 +11,8 @@ Ext.onReady(function(){
     constructor: function(config) {
       this.callParent(arguments);
       this.pid = config.pid;
-      this.deparam = this.createParamDeserializer();
-      this.add(this.createContent(ContentModelViewer.properties.url.object.overview(config.pid)));
+      url = config.url == undefined ? ContentModelViewer.properties.url.object.overview(config.pid) : config.url;
+      this.add(this.createContent(url));
       var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
         region: 'east',
         pid: config.pid
@@ -64,47 +64,6 @@ Ext.onReady(function(){
         }
       });
     },
-    // Yanked from https://github.com/jupiterjs/jquerymx/blob/master/lang/string/deparam/deparam.js
-    createParamDeserializer: function() {
-      var digitTest = /^\d+$/,
-		  keyBreaker = /([^\[\]]+)|(\[\])/g,
-		  plus = /\+/g,
-		  paramTest = /([^?#]*)(#.*)?$/;
-		  return function(params){
-			  if(! params || ! paramTest.test(params) ) {
-				  return {};
-			  }
-			  var data = {},
-				pairs = params.split('&'),
-				current;
-			  for(var i=0; i < pairs.length; i++){
-				  current = data;
-				  var pair = pairs[i].split('=');
-				  // if we find foo=1+1=2
-				  if(pair.length != 2) {
-					  pair = [pair[0], pair.slice(1).join("=")]
-				  }
-          var key = decodeURIComponent(pair[0].replace(plus, " ")),
-          value = decodeURIComponent(pair[1].replace(plus, " ")),
-					parts = key.match(keyBreaker);
-				  for ( var j = 0; j < parts.length - 1; j++ ) {
-					  var part = parts[j];
-					  if (!current[part] ) {
-						  // if what we are pointing to looks like an array
-						  current[part] = digitTest.test(parts[j+1]) || parts[j+1] == "[]" ? [] : {}
-					  }
-					  current = current[part];
-				  }
-				  lastPart = parts[parts.length - 1];
-				  if(lastPart == "[]") {
-					  current.push(value)
-				  } else{
-					  current[lastPart] = value;
-				  }
-			  }
-			  return data;
-		  }
-	  },
     loadContent: function (url, params, success) {
       var loader = this.getComponent('content').getLoader();
       loader.clearListeners();
@@ -139,8 +98,8 @@ Ext.onReady(function(){
       }
       return params;
     },
-    loadAddObjectContent: function (form_selector, success) {
-      this.loadContent(ContentModelViewer.properties.url.object.add(this.pid), this.getFormParams(form_selector), success);
+    loadAddObjectContent: function (url, form_selector, success) {
+      this.loadContent(url, this.getFormParams(form_selector), success);
     },
     loadEditPermissionContent: function (form_selector) {
       this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid), this.getFormParams(form_selector));

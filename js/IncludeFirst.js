@@ -94,7 +94,7 @@ ContentModelViewer.setup.initProperties = function() {
       treemembers: url_replace_pid_func('#object_treemembers_url'),
       treemember: url_replace_pid_func('#object_treemember_url'),
       remove_relationship: url_replace_pid_dsid_func('#object_remove_relationship_url'),
-      add: url_replace_pid_func('#object_add_url'),
+      add: url_replace_pid_dsid_func('#object_add_url'),
       purge: url_replace_pid_func('#object_purge_url')
     },
     datastream: {
@@ -161,20 +161,22 @@ ContentModelViewer.setup.defineFunctions = function() {
         overview.setPid(pid)
       }
     },
-    // Shows a Resource, has no effect on the Current Collection, Focus Viewer and Manage panels on the Resource.
-    loadResource: function(pid) {
-      pid = pid || properties.pids.resource;
+    // Shows a Resource, has no effect on the Current Collection, Focus Viewer and Manage panels on the Resource. If pid is null display the add form.
+    loadResource: function(prop) {
+      prop = prop || { pid: properties.pids.resource };
+      prop.pid = prop.pid !== undefined ? prop.pid : properties.pids.resource;
       var tabpanel = Ext.getCmp('cmvtabpanel');
       var overview = tabpanel.getComponent('resource-overview');
       if(!overview && ContentModelViewer.widgets.OverviewPanel != undefined) { // Create the panel and insert it in the first position if it doesn't exist.
         tabpanel.insert(2, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
           title:'Resource Overview',
           itemId: 'resource-overview',
-          pid: pid
+          pid: prop.pid,
+          url: prop.url
         }));
       }
       else if (overview) {
-        overview.setPid(pid)
+        overview.setPid(prop.pid)
       }
     },
     // Hides the Resource Panel changes the focus of the
@@ -226,7 +228,10 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     loadAddResourceForm: function () {
       var cmv = this;
-      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadAddObjectContent('#add-resource-form form', function(loader, response, options) {
+      var overview = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
+      var url = ContentModelViewer.properties.url.object.add(ContentModelViewer.properties.pids.concept, 'resource');
+      var form_selector = '#add-resource-form form';
+      var success = function(loader, response, options) {
         if(response.responseText != undefined) {
           var data = JSON.parse(response.responseText);
           if(data.refresh) {
@@ -235,11 +240,19 @@ ContentModelViewer.setup.defineFunctions = function() {
             cmv.refreshResources(); // Show object in page if possible.
           }
         }
-      });
+      }
+      if(!overview) {
+        this.loadResource({ url: url });
+      }
+      else {
+        overview.loadAddObjectContent(url, form_selector, success);
+      }
+      this.showResource();
     },
     loadAddConceptForm: function () {
       var cmv = this;
-      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadAddObjectContent('#add-concept-form form', function(loader, response, options) {
+      var url = ContentModelViewer.properties.url.object.add(ContentModelViewer.properties.pids.concept, 'concept');
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadAddObjectContent(url, '#add-concept-form form', function(loader, response, options) {
         if(response.responseText != undefined) {
           var data = JSON.parse(response.responseText);
           if(data.refresh) {
