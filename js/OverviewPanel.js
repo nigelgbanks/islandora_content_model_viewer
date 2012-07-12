@@ -137,8 +137,10 @@ Ext.onReady(function(){
           }
         }
       }
-      console.log(params);
       return params;
+    },
+    loadAddObjectContent: function (form_selector, success) {
+      this.loadContent(ContentModelViewer.properties.url.object.add(this.pid), this.getFormParams(form_selector), success);
     },
     loadEditPermissionContent: function (form_selector) {
       this.loadContent(ContentModelViewer.properties.url.object.permission_form(this.pid), this.getFormParams(form_selector));

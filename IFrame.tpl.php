@@ -30,6 +30,7 @@ media="all"href="/sites/all/modules/content_model_viewer/css/ContentModelViewer.
     <div id="object_treemember_url"><?php print check_url(url($paths['object']['treemember'])); ?></div>
     <div id="object_remove_relationship_url"><?php print check_url(url($paths['object']['remove_relationship'])); ?></div>
     <div id="object_purge_url"><?php print check_url(url($paths['object']['purge'])); ?></div>
+    <div id="object_add_url"><?php print check_url(url($paths['object']['add'])); ?></div>
     <div id="datastream_add_url"><?php print check_url(url($paths['datastream']['add'])); ?></div>
     <div id="datastream_purge_url"><?php print check_url(url($paths['datastream']['purge'])); ?></div>
     <div id="datastream_download_url"><?php print check_url(url($paths['datastream']['download'])); ?></div>

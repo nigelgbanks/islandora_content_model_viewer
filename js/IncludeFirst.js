@@ -94,6 +94,7 @@ ContentModelViewer.setup.initProperties = function() {
       treemembers: url_replace_pid_func('#object_treemembers_url'),
       treemember: url_replace_pid_func('#object_treemember_url'),
       remove_relationship: url_replace_pid_dsid_func('#object_remove_relationship_url'),
+      add: url_replace_pid_func('#object_add_url'),
       purge: url_replace_pid_func('#object_purge_url')
     },
     datastream: {
@@ -222,6 +223,32 @@ ContentModelViewer.setup.defineFunctions = function() {
       else if(panel) {
         panel.setPid(pid);
       }
+    },
+    loadAddResourceForm: function () {
+      var cmv = this;
+      Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadAddObjectContent('#add-resource-form form', function(loader, response, options) {
+        if(response.responseText != undefined) {
+          var data = JSON.parse(response.responseText);
+          if(data.refresh) {
+            cmv.refreshTreeNodes(ContentModelViewer.properties.pids.concept); // Update the number in the tree
+            cmv.selectResource(data.refresh); // Should be newly created object.
+            cmv.refreshResources(); // Show object in page if possible.
+          }
+        }
+      });
+    },
+    loadAddConceptForm: function () {
+      var cmv = this;
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadAddObjectContent('#add-concept-form form', function(loader, response, options) {
+        if(response.responseText != undefined) {
+          var data = JSON.parse(response.responseText);
+          if(data.refresh) {
+            cmv.refreshTreeNodes(ContentModelViewer.properties.pids.concept); // Update the object we were previously on
+            cmv.refreshTree(ContentModelViewer.properties.pids.concept);
+            cmv.selectConcept(data.refresh); // Should be newly created object.
+          }
+        }
+      });
     },
     loadResourceEditMetadataForm: function () {
       var cmv = this;

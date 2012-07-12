@@ -103,6 +103,12 @@ function content_model_viewer_menu() {
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS),
     'type' => MENU_CALLBACK,
   );
+  $items['viewer/%/add_form'] = array(
+    'page callback' => 'content_model_viewer_add_object',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
   $items['viewer/%/collection/remove/%'] = array(
     'page callback' => 'content_model_viewer_remove_from_collection',
     'page arguments' => array(1, 4, 5),
@@ -517,7 +523,8 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
       'members' => "viewer/pid/members",
       'treemembers' => "viewer/pid/treemembers",
       'treemember' => "viewer/pid/treemember",
-      'purge' => "viewer/pid/purge"
+      'purge' => "viewer/pid/purge",
+      'add' => "viewer/pid/add_form"
     ),
     'datastream' => array(
       'add' => "viewer/pid/add",
@@ -784,7 +791,6 @@ function content_model_viewer_form_islandora_xacml_editor_page_submit($form, &$f
  */
 function content_model_viewer_metadata_form($pid, $action = 'edit') {
   // If concept
-  error_log(print_r($_POST, TRUE));
   $cmodels = content_model_viewer_get_cmodels($pid);
   $id = in_array('islandora:collectionCModel', $cmodels) ? 'concept-metadata-form' : 'resource-metadata-form';
   $data = theme('content_model_viewer_metadata_form', $id, $pid, 'edit');
@@ -969,6 +975,36 @@ function content_model_viewer_purge_object($pid) {
   echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
   exit();
 }
+
+function content_model_viewer_add_object($pid) {
+  $cmodels = content_model_viewer_get_cmodels($pid);
+  $id = in_array('islandora:collectionCModel', $cmodels) ? 'add-concept-form' : 'add-resource-form';
+  $action = in_array('islandora:collectionCModel', $cmodels) ? 'ingest-concept' : 'ingest-resource';
+  $data = theme('content_model_viewer_metadata_form', $id, $pid, $action);
+  $javascript = drupal_add_js(NULL, NULL, 'header');
+  $settings = $javascript['setting'];
+  if (isset($settings)) {
+    $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
+    unset($settings['ahah']['']);
+  }
+  $js = $javascript['module'];
+  $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
+  $files = array();
+  foreach($js as $path => $properties) {
+    $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
+  }
+  $css_files = array();
+  $css = content_model_viewer_grab_css();
+  foreach($css['all'] as $group) {
+    foreach($group as $path => $bool) {
+      $css_files[] = base_path() . $path . $query_string;
+    }
+  }
+  header("Content-type: application/json");
+  echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => NULL, 'settings' => $settings, 'js' => $files, 'css' => $css_files, 'refresh' => $refresh));
+  exit();
+}
+
 
 /**
  *
@@ -1225,6 +1261,32 @@ function content_model_viewer_edit_metadata_form_submit(array &$form, array &$fo
   $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
 }
 
+function content_model_viewer_ingest_concept_metadata_form(array &$form_state, $collection_pid) {
+  return fedora_repository_ingest_form($form_state, $collection_pid);
+}
+
+function content_model_viewer_ingest_concept_metadata_form_validate(array &$form, array &$form_state) {
+  fedora_repository_ingest_form_validate($form, $form_state);
+}
+
+function content_model_viewer_ingest_concept_metadata_form_submit(array &$form, array &$form_state) {
+  fedora_repository_ingest_form_submit($form, $form_state);
+  $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
+  $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
+}
+
+function content_model_viewer_ingest_resource_metadata_form(array &$form_state, $collection_pid) {
+  return content_model_viewer_ingest_metadata_form($form_state, $collection_pid);
+}
+
+function content_model_viewer_ingest_resource_metadata_form_validate(array &$form, array &$form_state) {
+  content_model_viewer_ingest_metadata_form_validate($form, $form_state);
+}
+
+function content_model_viewer_ingest_resource_metadata_form_submit(array &$form, array &$form_state) {
+  content_model_viewer_ingest_metadata_form_submit($form, $form_state);
+}
+
 function content_model_viewer_ingest_metadata_form(array &$form_state, $collection_pid) {
   if (!user_access('ingest new fedora objects')) {
     drupal_set_message(t('You do not have permission to ingest.'), 'error');
@@ -1320,5 +1382,7 @@ function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$
   if ($form_state['storage']['step'] == 2) {
     $ingest_form = new IngestObjectMetadataForm();
     $ingest_form->submit($form, $form_state);
+    $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
   }
+  $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
 }
