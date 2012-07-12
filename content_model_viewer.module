@@ -1270,9 +1270,9 @@ function content_model_viewer_ingest_concept_metadata_form_validate(array &$form
 }
 
 function content_model_viewer_ingest_concept_metadata_form_submit(array &$form, array &$form_state) {
-  fedora_repository_ingest_form_submit($form, $form_state);
   $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
   $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
+  // Ingestion is handled by sidora hook urg...
 }
 
 function content_model_viewer_ingest_resource_metadata_form(array &$form_state, $collection_pid) {
@@ -1284,7 +1284,9 @@ function content_model_viewer_ingest_resource_metadata_form_validate(array &$for
 }
 
 function content_model_viewer_ingest_resource_metadata_form_submit(array &$form, array &$form_state) {
-  content_model_viewer_ingest_metadata_form_submit($form, $form_state);
+  $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
+  $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
+  // Ingestion is handled by the sidora hook... urg..
 }
 
 function content_model_viewer_ingest_metadata_form(array &$form_state, $collection_pid) {
