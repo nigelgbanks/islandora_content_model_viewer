@@ -184,40 +184,6 @@
   });
 });*/
 
-var sorter = (function() {
-  var type = 0;
-  var types = ['label', 'created'];
-  var direction = 0;
-  var directions = ['ASC', 'DESC'];
-  var labels = ['Label', 'Date Created'];
-  return {
-    toggleType: function() {
-      type = type ? 0 : 1;
-    },
-    toggleDirection: function() {
-      direction = direction ? 0: 1;
-    },
-    type: function() {
-      return types[type];
-    },
-    label: function() {
-      return labels[type];
-    },
-    direction: function() {
-      return directions[direction];
-    },
-    refresh: function() {
-      var store = Ext.data.StoreManager.lookup('members');
-      store.sorters.clear();
-      store.sorters.add(new Ext.util.Sorter({
-        property: this.type(),
-        direction: this.direction()
-      }));
-      store.load();
-    }
-  };
-})();
-
 Ext.onReady(function(){
   Ext.define('ContentModelViewer.widgets.CollectionDataView', {
 	  extend: 'Ext.view.View',
@@ -308,7 +274,6 @@ Ext.onReady(function(){
 		  }));
 	  }
   });
-
   Ext.define('ContentModelViewer.widgets.CollectionPanel', {
 	  extend: 'Ext.panel.Panel',
 	  id: 'collectionpanel',
@@ -318,12 +283,61 @@ Ext.onReady(function(){
 		  this.callParent(arguments);
 		  this.add(Ext.create('ContentModelViewer.widgets.CollectionDataView', { pid: config.pid }));
       var store = this.getComponent('collectiondataview').getStore();
+      var sorter = (function() {
+        var type = 0;
+        var types = ['label', 'created'];
+        var direction = 0;
+        var directions = ['ASC', 'DESC'];
+        var labels = ['Label', 'Date Created'];
+        return {
+          toggleType: function() {
+            type = type ? 0 : 1;
+          },
+          toggleDirection: function() {
+            direction = direction ? 0: 1;
+          },
+          type: function() {
+            return types[type];
+          },
+          label: function() {
+            return labels[type];
+          },
+          direction: function() {
+            return directions[direction];
+          },
+          refresh: function() {
+            store.sorters.clear();
+            store.sorters.add(new Ext.util.Sorter({
+              property: this.type(),
+              direction: this.direction()
+            }));
+            store.load();
+          }
+        };
+      })();
 		  this.addDocked(Ext.create('Ext.toolbar.Toolbar', {
         itemId: 'toolbar',
         dock: 'top',
         items: [{
           xtype: 'tbtext',
           text: 'Sort By: '
+        }, Ext.create('Ext.Action', {
+          text : sorter.label(),
+          handler: function(action, event) {
+            sorter.toggleType();
+            action.setText(sorter.label());
+            sorter.refresh();
+          }
+        }), {
+          xtype: 'sortbutton',
+          text : sorter.direction(),
+          listeners: {
+            changeDirection: function(direction) {
+              sorter.toggleDirection();
+              this.setText(sorter.direction());
+              sorter.refresh();
+            }
+          }
         }, {
           xtype: 'tbtext',
           text: 'Search'
@@ -334,13 +348,13 @@ Ext.onReady(function(){
           xtype: 'button',
           text: 'Go',
           handler: function(button, event) {
-            // var filters = store.filters;
-            // var label = filters.get(0);
-            // var toolbar = button.up('toolbar');
-            // var search = toolbar.down('textfield');
-            // var value = Ext.String.trim(search.getValue());
-            // label.value = value != '' ? value : null;
-            // store.load();
+            var filters = store.filters;
+            var label = filters.get(0);
+            var toolbar = button.up('toolbar');
+            var search = toolbar.down('textfield');
+            var value = Ext.String.trim(search.getValue());
+            label.value = value != '' ? value : null;
+            store.load();
           }
         }, '->', {
           xtype: 'button',
@@ -348,7 +362,10 @@ Ext.onReady(function(){
           handler: function(button, event) {
             ContentModelViewer.functions.loadAddResourceForm();
           }
-        }]
+        }],
+        constructor: function(config) {
+		      this.callParent(arguments);
+        }
       }));
 		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'top', displayInfo: true, itemId: 'top-pager' }));
       this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'bottom', displayInfo: true, itemId: 'bottom-pager' }));
