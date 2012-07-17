@@ -181,6 +181,7 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     // Hides the Resource Panel changes the focus of the
     closeResource: function() {
+      properties.pids.resource = undefined;
       var overview = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
       if(overview) {
         overview.close();
@@ -305,7 +306,13 @@ ContentModelViewer.setup.defineFunctions = function() {
     refreshResource: function() {
       var panel = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
       if(panel) {
-        panel.refresh();
+        if(properties.pids.resource !== undefined) {
+          panel.refresh();
+        }
+        else {
+          this.closeResource();
+          this.showConcept();
+        }
       }
     },
     //
