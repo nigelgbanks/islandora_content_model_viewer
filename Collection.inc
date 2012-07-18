@@ -514,7 +514,7 @@ class Collection {
   private function getType($pid) {
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
     $types = array(
-      'si:datasetCModel' => 'Tabular',
+      'si:datasetCModel' => 'Dataset',
       'si:imageCModel' => 'Image',
       'si:fieldbookCModel' => 'Text'
     );
