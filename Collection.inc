@@ -512,36 +512,17 @@ class Collection {
    * @return type
    */
   private function getType($pid) {
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $item = new Fedora_Item($pid);
-    if (isset($item->datastreams['DC'])) {
-      $types = array(
-        'Collection' => 'Collection',
-        'DataSet' => 'Data Set',
-        'Service' => 'Service',
-        'Software' => 'Software',
-        'Image' => 'Image',
-        'InteractiveResource' => 'Interactive Resource',
-        'MovingImage' => 'Video',
-        'PhysicalObject' => 'Physical Object',
-        'Sound' => 'Audio',
-        'StillImage' => 'Image',
-        'Text' => 'Text',
-      );
-      $dc = $item->get_datastream_dissemination('DC');
-      if (isset($dc)) {
-        $document = new DOMDocument();
-        $document->loadXML($dc);
-        $xpath = new DOMXPath($document);
-        $results = $xpath->query('//*[local-name() = "type"]');
-        $length = $results->length;
-        for ($i = 0; $i < $length; $i++) {
-          $node = $results->item($i);
-          $type = trim($node->textContent);
-          if (array_key_exists($type, $types)) {
-            return $types[$type];
-          }
-        }
+    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+    $types = array(
+      'si:datasetCModel' => 'Tabular',
+      'si:imageCModel' => 'Image',
+      'si:fieldbookCModel' => 'Text'
+    );
+    $object_helper = new ObjectHelper();
+    $content_models = $object_helper->get_content_models_list($pid);
+    foreach ($content_models as $content_model) {
+      if (isset($types[$content_model->pid])) {
+        return $types[$content_model->pid];
       }
     }
     return 'Text';
