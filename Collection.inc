@@ -124,12 +124,14 @@ class Collection {
 
   public function getTreeMembers() {
     $query = 'select $object $title $model $created $parent_model
-    count(select $pid from <#ri> where $object <fedora-model:hasModel> $sub_model
+    count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
      and $sub_model <fedora-model:hasModel> $sub_parent_model
      and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
      and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object)
+     and $pid <fedora-model:hasModel> $child_model
+     and ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object))
+     minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
     )
     from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
      and $object <fedora-model:hasModel> $model
