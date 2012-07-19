@@ -1,6 +1,10 @@
 /**
  * Display the viewer.
  */
+Ext.require('Ext.state.CookieProvider');
+Ext.require('Ext.container.Viewport');
+Ext.require('Ext.layout.container.Border');
+Ext.require('Ext.tab.Panel');
 
 Ext.onReady(function(){
   // Local Variables
@@ -82,6 +86,7 @@ Ext.onReady(function(){
           if ( token && this.isVisible(token)) {
             this.setActiveTab(token);
           }
+          setup.navigateToObject();
         }
       }
     }]

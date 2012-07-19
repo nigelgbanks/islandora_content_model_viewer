@@ -45,6 +45,22 @@ ContentModelViewer.setup.setUpGlobalEvents = function() {
   }
 }
 /**
+ * Set up events on global objects such as the window or document.
+ */
+ContentModelViewer.setup.navigateToObject = function() {
+  var functions = ContentModelViewer.functions;
+  var properties = ContentModelViewer.properties;
+  if(properties.pid !== "") {
+    if(properties.isCollection) {
+      functions.selectConcept(properties.pid);
+    }
+    else {
+      functions.selectResource(properties.pid);
+    }
+  }
+}
+
+/**
  * Set up the properties for the Content Model Viewer
  */
 ContentModelViewer.setup.initProperties = function() {
@@ -75,10 +91,10 @@ ContentModelViewer.setup.initProperties = function() {
   properties.root = $('#root').text();
   properties.pid = $('#pid').text();
   properties.pids = {
-    collection: properties.pid,
-    concept: properties.pid,
-    resource: properties.pid,
-    focused: properties.pid
+    collection: undefined,
+    concept: undefined,
+    resource: undefined,
+    focused: undefined
   }
   properties.dsid = $('#dsid').text();
   properties.viewFunction = $('#view_function').text();
@@ -418,7 +434,7 @@ ContentModelViewer.setup.defineFunctions = function() {
 ContentModelViewer.setup.defineModels = function() {
   // Local Variables
   var properties = ContentModelViewer.properties;
-  var url = properties.url, pid = properties.pid, dsid = properties.dsid;
+  var url = properties.url, pid = properties.pid, root = properties.root, dsid = properties.dsid;
   Ext.define('ContentModelViewer.models.FedoraObject', {
     extend: 'Ext.data.Model',
     fields: [{
@@ -459,7 +475,7 @@ ContentModelViewer.setup.defineModels = function() {
     fields: ['id','text', 'link','pid','leaf','children'],
     proxy: {
       type: 'ajax',
-      url : url.object.treemembers(pid),
+      url : url.object.treemembers(root),
       reader: {
         type: 'json',
         root: 'data'

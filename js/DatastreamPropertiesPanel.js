@@ -1,3 +1,4 @@
+Ext.require('Ext.grid.plugin.RowEditing');
 Ext.onReady(function(){
   Ext.define('ContentModelViewer.widgets.DatastreamPropertiesPanel', {
     extend: 'Ext.grid.Panel',
@@ -40,7 +41,7 @@ Ext.onReady(function(){
           totalProperty: 'total'
         }
       });
-      
+
       this.store.load();
     },
     getSelected: function() {
@@ -57,29 +58,29 @@ Ext.onReady(function(){
       clicksToEdit: 2
     })],
     columns: [{
-      header: 'ID',  
+      header: 'ID',
       dataIndex: 'dsid',
       flex: 1
     }, {
-      header: 'Label', 
-      dataIndex: 'label', 
+      header: 'Label',
+      dataIndex: 'label',
       field:{
         xtype:'textfield',
         allowBlank:false
       },
       flex: 1
     }, {
-      header: 'State', 
+      header: 'State',
       dataIndex: 'state',
       field:{
         xtype:'combobox',
         store: Ext.create('Ext.data.Store', {
           fields: ['value', 'name'],
           data : [{
-            "value":"A", 
+            "value":"A",
             "name":"Active"
           }, {
-            "value":"I", 
+            "value":"I",
             "name":"Inactive"
           }]
         }),
@@ -89,7 +90,7 @@ Ext.onReady(function(){
         value: "Inactive"
       }
     }, {
-      header: 'Mime Type', 
+      header: 'Mime Type',
       dataIndex: 'mime',
       field:{
         xtype:'textfield',
@@ -97,7 +98,7 @@ Ext.onReady(function(){
       },
       flex: 1
     }, {
-      header: 'Date Created', 
+      header: 'Date Created',
       dataIndex: 'created',
       flex: 1
     }],
@@ -118,7 +119,7 @@ Ext.onReady(function(){
             enable ? component.enable() : component.disable();
           }
         }
-      }      
+      }
     },
     dockedItems: [{
       xtype: 'toolbar',
@@ -157,10 +158,10 @@ Ext.onReady(function(){
                 store: Ext.create('Ext.data.Store', {
                   fields: ['value', 'name'],
                   data : [{
-                    "value":"A", 
+                    "value":"A",
                     "name":"Active"
                   }, {
-                    "value":"I", 
+                    "value":"I",
                     "name":"Inactive"
                   }]
                 }),
@@ -175,16 +176,16 @@ Ext.onReady(function(){
                 store: Ext.create('Ext.data.Store', {
                   fields: ['value', 'name'],
                   data : [{
-                    "value":"X", 
+                    "value":"X",
                     "name":"Internal XML"
                   }, {
-                    "value":"M", 
+                    "value":"M",
                     "name":"Managed Content"
                   }, {
-                    "value":"E", 
+                    "value":"E",
                     "name":"External Referenced Content"
                   }, {
-                    "value":"R", 
+                    "value":"R",
                     "name":"Redirect Referenced Content"
                   }]
                 }),
@@ -311,7 +312,7 @@ Ext.onReady(function(){
             action.set({
               value: 'edit'
             });
-            document.forms["datastream-edit-form"].submit();              
+            document.forms["datastream-edit-form"].submit();
           }
         }
       }, {
