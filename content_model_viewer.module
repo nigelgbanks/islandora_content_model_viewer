@@ -552,16 +552,12 @@ function content_model_viewer($pid = NULL) {
     drupal_set_message(t('The Fedora resource index search is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
     return '';
   }
-  if ($pid == NULL) {
-    $pid = variable_get('fedora_repository_pid', 'islandora:root');
+  if ($pid !== NULL) {
+    $item = new fedora_item($pid);
+    if (!$item->exists()) {
+      $pid = NULL;
+    }
   }
-  $item = new fedora_item($pid);
-  if (!$item->exists()) {
-    drupal_not_found();
-    exit();
-  }
-  // End of COPY
-  $pid = isset($pid) ? $pid : variable_get('fedora_repository_pid', 'islandora:root');
   return theme('content_model_viewer', $pid);
   /*
   $path = drupal_get_path('module', 'content_model_viewer');
