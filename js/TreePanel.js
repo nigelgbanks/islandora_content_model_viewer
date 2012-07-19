@@ -15,8 +15,10 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   useArrows: true,
   getNodesByPid: function(pid) {
     var nodes = [];
-    var root = this.store.getRootNode();
-    root.cascadeBy(function(n) { if(n.get('pid') == pid) { nodes.push(n); } });
+    if(typeof(pid) == 'string' && pid.length > 0) {
+      var root = this.store.getRootNode();
+      root.cascadeBy(function(n) { if(n.get('pid') == pid) { nodes.push(n); } });
+    }
     return nodes;
   },
   getParentNodesByPid: function(pid) {
@@ -34,23 +36,28 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     for(var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       this.refreshNodes(node.get('pid'));
-      this.store.load({ node: node, url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root) });
+      this.loadPid(node.get('pid'));
+    }
+  },
+  loadPid: function(pid) {
+    if(typeof(pid) == 'string' && pid.length > 0) {
+      this.store.load({ url: ContentModelViewer.properties.url.object.treemembers(pid) });
     }
   },
   refreshChildren: function(pid) {
     if(pid != undefined) {
       if(pid == ContentModelViewer.properties.root) {
-        this.store.load({ url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root) });
+        this.loadPid(pid);
       }
       else {
         this.loadNodes(this.getNodesByPid(pid));
       }
     }
-    else {
+    /*else {
       this.store.load({
         url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root),
       });
-    }
+    }*/
   },
   refreshParents: function(pid) {
     if(pid != undefined) {
