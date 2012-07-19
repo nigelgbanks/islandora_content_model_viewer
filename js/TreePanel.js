@@ -66,6 +66,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
         success: function(response){
           var data = JSON.parse(response.responseText);
           node.set('text', data.label);
+          node.set('leaf', false); // May have added a child.
           node.commit();
         }
       });
