@@ -366,7 +366,17 @@ function content_model_viewer_get_registered_content_model_viewer($pid) {
     }
   }
   module_load_include('inc', 'content_model_viewer', 'models/Default');
-  return new DefaultModelViewer($pid);
+  // Default Display
+  $model = module_invoke_all('register_default_content_model_for_viewer');
+  if(!empty($model)) { // If more than one is defined used the last one, ideally this would be exposed via a settings menu and one would be selected.
+    $model = array_pop($model); // Last model
+    module_load_include($model['type'], $model['module'], $model['file']);
+    $class = $model['class'];
+    return new $class($pid);
+  }
+  else {
+    return new DefaultModelViewer($pid);
+  }
 }
 
 /**
