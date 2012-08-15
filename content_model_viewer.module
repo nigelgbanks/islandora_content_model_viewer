@@ -625,7 +625,7 @@ function content_model_viewer_iframe($pid = NULL) {
   $path = drupal_get_path('module', 'content_model_viewer');
   $js_path = $path . '/js';
   module_load_include('inc', 'extjs', 'extjs.utils');
-  extjs_add_js_file('ext');
+  extjs_add_all();
   extjs_add_css_file('ext-all-gray');
   drupal_add_css(drupal_get_path('module', 'sidora_islandora') . '/css/smith.css', 'theme'); // God awful hack
   /* Load Panels/Widgets */
