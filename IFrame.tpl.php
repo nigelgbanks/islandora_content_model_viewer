@@ -1,11 +1,5 @@
 <html>
 <head>
-   <!--<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/defaults.css">
-   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/system.css">
-   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/libraries/extjs/resources/css/ext-all-gray.css">
-   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/content_model_viewer/css/smith.css">
-   <link type="text/css" rel="stylesheet"
-media="all"href="/sites/all/modules/content_model_viewer/css/ContentModelViewer.css"> -->
    <?php print $styles; ?>
    <?php print $scripts; ?>
 </head>

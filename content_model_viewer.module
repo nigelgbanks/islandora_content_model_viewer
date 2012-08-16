@@ -627,7 +627,7 @@ function content_model_viewer_iframe($pid = NULL) {
   module_load_include('inc', 'extjs', 'extjs.utils');
   extjs_add_all();
   extjs_add_css_file('ext-all-gray');
-  drupal_add_css(drupal_get_path('module', 'sidora_islandora') . '/css/smith.css', 'theme'); // God awful hack
+  drupal_add_css(drupal_get_path('module', 'sidora') . '/css/smith.css', 'theme'); // God awful hack
   /* Load Panels/Widgets */
   drupal_add_js($js_path . '/IncludeFirst.js');
   drupal_add_js($js_path . '/SortButton.js');
