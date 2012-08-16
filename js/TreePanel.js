@@ -95,6 +95,6 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
         ContentModelViewer.functions.selectConcept(pid);
       }
     }
-  },
+  }
 });
 
