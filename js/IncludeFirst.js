@@ -499,7 +499,7 @@ ContentModelViewer.setup.defineModels = function() {
     }, {
       name: 'modified',
       type: 'string'
-    },],
+    }],
     validations: [{
       type: 'inclusion',
       field: 'state',
