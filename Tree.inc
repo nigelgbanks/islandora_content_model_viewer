@@ -104,7 +104,7 @@ class Tree {
     $node['pid'] = $member['pid'];
     $node['dsid'] = isset($member['dsid']) ? $member['dsid'] : NULL;
     $node['view'] = isset($member['view']) ? $member['view'] : NULL;
-    $node['iconCls'] = preg_replace('/^[^:]*\:/', '', $member['model']); // Strip the namespace
+    $node['iconCls'] = preg_replace('/^[^:]*\:/', '', $member['model']) . ' ' . $member['pid']; // Strip the namespace
     $node['expanded'] = $this->shouldExpandNode($member['pid']);
     //$node['cls'] = $node['expanded'] ? 'x-tree-bold' : '';
     return $node;
