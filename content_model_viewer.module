@@ -515,9 +515,15 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   $variables['styles'] = drupal_get_css(content_model_viewer_grab_css());
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
+  if($item->exists()) {
+    $variables['label'] = $item->objectProfile->objLabel;
+    $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
+  }
+  else {
+    $variables['pid'] = $variables['label'] = '';
+    $variables['is_collection'] = 'false';
+  }
   $variables['root'] = variable_get('fedora_repository_pid', 'islandora:root');
-  $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
-  $variables['label'] = $item->objectProfile->objLabel;
   $variables['base_url'] = $base_url;
   $variables['dsid'] = 'SWF'; // Default viewer.
   $variables['view_function'] = 'loadFlexPlayer';
