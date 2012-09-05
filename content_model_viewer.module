@@ -704,7 +704,8 @@ function content_model_viewer_overview($pid) {
         $css_files[] = base_path() . $path . $query_string;
       }
     }
-    $data = '<span class="drupal-content">' . $data . '</span>';
+    $status = theme_status_messages();
+    $data = '<span class="drupal-content">' . $status . $data . '</span>';
     $refresh = NULL;
     if($_SESSION['content_model_viewer_refresh_tree']) {
       $refresh = $_SESSION['content_model_viewer_refresh_tree']; // Yuck
