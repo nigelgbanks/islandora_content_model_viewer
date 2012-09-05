@@ -518,6 +518,7 @@ class Collection {
     $types = array(
       'si:datasetCModel' => 'Dataset',
       'si:imageCModel' => 'Image',
+      'si:generalImageCModel' => 'Image',
       'si:fieldbookCModel' => 'Text'
     );
     $object_helper = new ObjectHelper();
