@@ -158,4 +158,28 @@
 .drupal-content div.messages {
     padding: 10px;
     margin: 20px;
+    border-style: solid;
+    border-width: 1px;
+    font-weight: bold;
+    margin-bottom: 1.5em;
+    overflow: hidden;
+    padding: 14px;
+}
+
+.drupal-content div.status {
+  background-color: #EAF8E4;
+  border-color: #8DC478;
+  color: #3E642F;
+}
+
+.drupal-content div.warning {
+  background: #FFFFDD;
+  border-color: #EED300;
+  color: #745500;
+}
+
+.drupal-content div.error {
+  background-color: #FFF2F2;
+  border-color: #CC0000;
+  color: #B20000;
 }
