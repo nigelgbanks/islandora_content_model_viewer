@@ -724,7 +724,8 @@ function content_model_viewer_permission_form($pid) {
   $cmodels = content_model_viewer_get_cmodels($pid);
   $id = in_array('islandora:collectionCModel', $cmodels) ? 'concept-permission-form' : 'resource-permission-form';
   $form = drupal_get_form('islandora_xacml_editor_page', $pid, 'POLICY');
-  $data = "<div id='$id' class='drupal-content'>$form</div>";
+  $status = theme_status_messages();
+  $data = "<div id='$id' class='drupal-content'>$status $form</div>";
   $javascript = drupal_add_js(NULL, NULL, 'header');
   $settings = $javascript['setting'];
   if (isset($settings)) {

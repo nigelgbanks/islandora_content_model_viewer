@@ -1,4 +1,4 @@
-/* 
+/*
     Document   : ADRBasic.inc
     Created on : 4-Oct-2010, 4:00:18 PM
     Author     : default
@@ -65,7 +65,7 @@
 }
 
 .member-item {
-  padding: 2px 5px; 
+  padding: 2px 5px;
   height: 36px;
 }
 
@@ -95,10 +95,10 @@
   background-color: #D3E1F1 !important;
 }
 
-.member-item-label { 
-  white-space: nowrap; 
-  text-overflow: ellipsis; 
-  overflow: hidden; 
+.member-item-label {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   padding-left: 2px;
 }
 
@@ -117,7 +117,7 @@
 /*
 .member-item-label {
     text-align: center;
-    
+
 }
 
 .member-item-description {
@@ -154,3 +154,8 @@
 /*.x-tree-icon { display: none !important; }*/
 
 .x-tree-bold div{ font-weight: bold; }
+
+.drupal-content div.messages {
+    padding: 10px;
+    margin: 20px;
+}
