@@ -35,13 +35,13 @@ Ext.onReady(function(){
       files.setPid(pid);
     },
     onLoad: function(store, records, successful, operation, eOpts) {
-      for(var i in records) {
+      for(var i = 0; i < records.length; i++) {
         var record = records[i];
         if(record.get('default')) {
           var pid = Ext.getCmp('viewerpanel').pid;
           var dsid = record.get('dsid');
           var viewFunction = record.get('view_function');
-          Ext.getCmp('datastream-viewer').view(pid, dsid, viewFunction); 
+          Ext.getCmp('datastream-viewer').view(pid, dsid, viewFunction);
           return;
         }
       }
