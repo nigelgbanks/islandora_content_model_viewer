@@ -1225,7 +1225,7 @@ function content_model_viewer_edit_metadata_form(array &$form_state, $pid) {
   try {
     $edit_form = new EditObjectMetadataForm();
     $output = $edit_form->create($pid, $client, $form_state);
-    $output['action'] = array(
+    $output['which_action'] = array(
       '#type' => 'hidden',
       '#value' => 'edit'
     );
@@ -1327,7 +1327,7 @@ function content_model_viewer_ingest_metadata_form(array &$form_state, $collecti
   try {
     $ingest_form = new IngestObjectMetadataForm();
     $output = $ingest_form->create($collection_pid, NULL, $form_state);
-    $output['action'] = array(
+    $output['which_action'] = array(
       '#type' => 'hidden',
       '#value' => 'ingest'
     );
