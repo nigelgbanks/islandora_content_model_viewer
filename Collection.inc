@@ -160,7 +160,6 @@ class Collection {
     $collection = new CollectionClass();
     $results = $collection->getRelatedObjects($pid, 1000000, NULL, $query);
     $results = trim($results);
-    error_log($pid);
     if ($results != '') {
       $document = new DOMDocument();
       $document->loadXML($results);
