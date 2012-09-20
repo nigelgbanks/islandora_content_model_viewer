@@ -514,10 +514,16 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   $variables['scripts'] = drupal_get_js('header', content_model_viewer_grab_js());
   $variables['styles'] = drupal_get_css(content_model_viewer_grab_css());
   $pid = $variables['pid'];
-  $item = new Fedora_Item($pid);
-  if($item->exists()) {
-    $variables['label'] = $item->objectProfile->objLabel;
-    $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
+  if(isset($pid)) {
+    $item = new Fedora_Item($pid);
+    if($item->exists()) {
+      $variables['label'] = $item->objectProfile->objLabel;
+      $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
+    }
+    else {
+      $variables['pid'] = $variables['label'] = '';
+      $variables['is_collection'] = 'false';
+    }
   }
   else {
     $variables['pid'] = $variables['label'] = '';

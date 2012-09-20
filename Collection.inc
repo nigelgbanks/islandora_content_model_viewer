@@ -75,14 +75,19 @@ class Collection {
   private static function isParentModelCollection($model) {
     module_load_include('inc', 'fedora_repository', 'ContentModel');
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
-    $object_helper = new ObjectHelper();
-    $content_models = $object_helper->get_content_models_list($model);
-    foreach ($content_models as $content_model) {
+    //$object_helper = new ObjectHelper();
+    // $content_models = $object_helper->get_content_models_list($model);
+    $repo = tuque_wrapper_get_repository_instance();
+    try {
+      $object = $repo->getObject($model);
+    } catch (Exception $e) { return FALSE; }
+    return array_search(self::COLLECTION_MODEL, $object->models);
+    /*    foreach ($content_models as $content_model) {
       if ($content_model->pid == self::COLLECTION_MODEL) {
         return TRUE;
       }
     }
-    return FALSE;
+    return FALSE;*/
   }
 
   /**
