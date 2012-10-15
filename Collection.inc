@@ -81,13 +81,7 @@ class Collection {
     try {
       $object = $repo->getObject($model);
     } catch (Exception $e) { return FALSE; }
-    return array_search(self::COLLECTION_MODEL, $object->models);
-    /*    foreach ($content_models as $content_model) {
-      if ($content_model->pid == self::COLLECTION_MODEL) {
-        return TRUE;
-      }
-    }
-    return FALSE;*/
+    return array_search(self::COLLECTION_MODEL, $object->models) !== FALSE;
   }
 
   /**
