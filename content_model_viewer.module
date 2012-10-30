@@ -275,7 +275,7 @@ function content_model_viewer_content_model_datastream_viewers() {
     'image/jpeg' => $image_basic,
     'image/gif' => $image_basic,
     'image/jp2' => $image_basic,
-    'image/jpeg' => $image_basic,
+    'image/jpg' => $image_basic,
     'image/png' => $image_basic,
     'image/raw' => $image_basic,
     'image/tiff' => $image_basic,
@@ -368,7 +368,7 @@ function content_model_viewer_get_registered_content_model_viewer($pid) {
   module_load_include('inc', 'content_model_viewer', 'models/Default');
   // Default Display
   $model = module_invoke_all('register_default_content_model_for_viewer');
-  if(!empty($model)) { // If more than one is defined used the last one, ideally this would be exposed via a settings menu and one would be selected.
+  if (!empty($model)) { // If more than one is defined used the last one, ideally this would be exposed via a settings menu and one would be selected.
     $model = array_pop($model); // Last model
     module_load_include($model['type'], $model['module'], $model['file']);
     $class = $model['class'];
@@ -465,18 +465,18 @@ function content_model_viewer_grab_css() {
     'system/system-menus.css' => FALSE,
     'system/user.css' => FALSE
   );
-  foreach($css['all'] as $group => &$styles) {
-    foreach($styles as $style => $bool) {
-      if(strpos($style, 'themes/')) { // Ignore the global themes
+  foreach ($css['all'] as $group => &$styles) {
+    foreach ($styles as $style => $bool) {
+      if (strpos($style, 'themes/')) { // Ignore the global themes
         unset($styles[$style]);
       }
       $filename = substr($style, strpos($style, 'modules/') + strlen('modules/'));
-      if(isset($replace[$filename])) {
-        if($replace[$filename] !== FALSE) {
+      if (isset($replace[$filename])) {
+        if ($replace[$filename] !== FALSE) {
           $position = array_search($style, array_keys($styles));
           $styles = content_model_viewer_array_insert($styles, array($replace[$filename] => TRUE), $position);
           unset($styles[$style]);
-          for($i = 0; $i <= $position; $i++) {
+          for ($i = 0; $i <= $position; $i++) {
             next($styles);
           }
         }
@@ -514,9 +514,9 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   $variables['scripts'] = drupal_get_js('header', content_model_viewer_grab_js());
   $variables['styles'] = drupal_get_css(content_model_viewer_grab_css());
   $pid = $variables['pid'];
-  if(isset($pid)) {
+  if (isset($pid)) {
     $item = new Fedora_Item($pid);
-    if($item->exists()) {
+    if ($item->exists()) {
       $variables['label'] = $item->objectProfile->objLabel;
       $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
     }
@@ -701,20 +701,20 @@ function content_model_viewer_overview($pid) {
     $js = $javascript['module'];
     $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
     $js_files = array();
-    foreach($js as $path => $properties) {
+    foreach ($js as $path => $properties) {
       $js_files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
     }
     $css_files = array();
     $css = content_model_viewer_grab_css();
-    foreach($css['all'] as $group) {
-      foreach($group as $path => $bool) {
+    foreach ($css['all'] as $group) {
+      foreach ($group as $path => $bool) {
         $css_files[] = base_path() . $path . $query_string;
       }
     }
     $status = theme_status_messages();
     $data = '<span class="drupal-content">' . $status . $data . '</span>';
     $refresh = NULL;
-    if($_SESSION['content_model_viewer_refresh_tree']) {
+    if ($_SESSION['content_model_viewer_refresh_tree']) {
       $refresh = $_SESSION['content_model_viewer_refresh_tree']; // Yuck
       unset($_SESSION['content_model_viewer_refresh_tree']);
     }
@@ -743,13 +743,13 @@ function content_model_viewer_permission_form($pid) {
   $js = $javascript['module'];
   $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
   $files = array();
-  foreach($js as $path => $properties) {
+  foreach ($js as $path => $properties) {
     $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
   }
   $css_files = array();
   $css = content_model_viewer_grab_css();
-  foreach($css['all'] as $group) {
-    foreach($group as $path => $bool) {
+  foreach ($css['all'] as $group) {
+    foreach ($group as $path => $bool) {
       $css_files[] = base_path() . $path . $query_string;
     }
   }
@@ -822,13 +822,13 @@ function content_model_viewer_metadata_form($pid, $action = 'edit') {
   $js = $javascript['module'];
   $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
   $files = array();
-  foreach($js as $path => $properties) {
+  foreach ($js as $path => $properties) {
     $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
   }
   $css_files = array();
   $css = content_model_viewer_grab_css();
-  foreach($css['all'] as $group) {
-    foreach($group as $path => $bool) {
+  foreach ($css['all'] as $group) {
+    foreach ($group as $path => $bool) {
       $css_files[] = base_path() . $path . $query_string;
     }
   }
@@ -976,10 +976,10 @@ function content_model_viewer_purge_object($pid) {
       $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
       $children = $xml->xpath("//ns:result/ns:o/@uri"); // Each unique child ignore another parents.
       $counts = array();
-      foreach($children as $child) {
+      foreach ($children as $child) {
         $counts[(string)$child]++;
       }
-      if(empty($counts) || min($counts) > 1) { // All child concepts/resource belong to other concepts
+      if (empty($counts) || min($counts) > 1) { // All child concepts/resource belong to other concepts
         $success = $properties->setState('D');
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
@@ -1009,13 +1009,13 @@ function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hack
   $js = $javascript['module'];
   $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
   $files = array();
-  foreach($js as $path => $properties) {
+  foreach ($js as $path => $properties) {
     $files[] = base_path() . $path . ($properties['cache'] ? $query_string : '?'. time());
   }
   $css_files = array();
   $css = content_model_viewer_grab_css();
-  foreach($css['all'] as $group) {
-    foreach($group as $path => $bool) {
+  foreach ($css['all'] as $group) {
+    foreach ($group as $path => $bool) {
       $css_files[] = base_path() . $path . $query_string;
     }
   }
@@ -1041,7 +1041,7 @@ function content_model_viewer_remove_from_collection($pid, $value) {
     $xml = simplexml_load_string($results);
     $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
     $parents = $xml->xpath("//ns:result/ns:o/@uri");
-    if(count($parents) < 2) {
+    if (count($parents) < 2) {
       echo json_encode(array('success' => FALSE, 'msg' => t('Object cannot be orphaned')));
       exit();
     }
@@ -1381,7 +1381,7 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
             file_delete($file);
             return;
           }
-          elseif (!$content_model->execIngestRules($file, $format)) {
+          else if (!$content_model->execIngestRules($file, $format)) {
             drupal_set_message(t('Error following Content Model Rules'), 'error');
             foreach (ContentModel::$errors as $error) {
               drupal_set_message($error, 'error');
