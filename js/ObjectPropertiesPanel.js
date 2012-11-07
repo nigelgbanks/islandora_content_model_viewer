@@ -30,7 +30,7 @@ Ext.onReady(function(){
         text: 'Edit Permissions',
         cls: 'x-btn-text-icon',
         iconCls: 'edit-datastream-icon',
-        id: 'edit-xacml',
+        id: 'object-properties-edit-xacml',
         handler: function() {
           Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
         }
