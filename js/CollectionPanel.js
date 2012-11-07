@@ -343,7 +343,8 @@ Ext.onReady(function(){
           text: 'Search'
         }, {
           xtype: 'textfield',
-          hideLabel: true
+          hideLabel: true,
+	  width: 200
         }, {
           xtype: 'button',
           text: 'Go',
