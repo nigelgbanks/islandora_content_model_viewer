@@ -509,6 +509,7 @@ function content_model_viewer_array_insert($arr, $insert, $position) {
  */
 function template_preprocess_content_model_viewer_iframe(array &$variables) {
   global $base_url;
+
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'content_model_viewer', 'Collection');
   $variables['scripts'] = drupal_get_js('header', content_model_viewer_grab_js());
@@ -529,7 +530,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
     $variables['pid'] = $variables['label'] = '';
     $variables['is_collection'] = 'false';
   }
-  $variables['root'] = variable_get('fedora_repository_pid', 'islandora:root');
+  $variables['root'] = $pid;
   $variables['base_url'] = $base_url;
   $variables['dsid'] = 'SWF'; // Default viewer.
   $variables['view_function'] = 'loadFlexPlayer';
@@ -578,6 +579,14 @@ function content_model_viewer($pid = NULL) {
     $item = new fedora_item($pid);
     if (!$item->exists()) {
       $pid = NULL;
+    }
+  }
+  else {
+    if (in_array('administrator', $user->roles)) {
+      $pid = variable_get('fedora_repository_pid', 'islandora:root');
+    }
+    else {
+      $pid = $user->islandora_user_pid;
     }
   }
   return theme('content_model_viewer', $pid);

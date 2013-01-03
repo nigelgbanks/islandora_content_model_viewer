@@ -45,7 +45,7 @@ class Tree {
   public function __construct($pid, $node = null) {
     $this->pid = $pid;
     $this->node = ($node != 'root' && !empty($node)) ? substr($node, 0, -8) : $node; // Sanitize $node value
-    $this->root = variable_get('fedora_repository_pid', 'islandora:root');
+    $this->root = ($pid == variable_get('fedora_repository_pid', 'islandora:root')) ? variable_get('fedora_repository_pid', 'islandora:root') : $pid;
   }
 
   /**
@@ -64,7 +64,7 @@ class Tree {
     $requested_pid = (!isset($this->node) || $this->node == 'root') ? $this->root : $this->node;
     $this->getParents($this->pid); // Sets an instance variable used in other functions thoughout this function.
     $tree = $this->buildTree($requested_pid);
-    return json_encode(array('success' => TRUE, 'data' => $tree, 'parents' => $this->parents));
+    return json_encode(array('success' => TRUE, 'data' => $tree, 'root' => $requested_pid, 'parents' => $this->parents));
   }
 
   /**

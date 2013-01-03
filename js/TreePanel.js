@@ -1,5 +1,9 @@
 Ext.define('ContentModelViewer.widgets.TreePanel', {
   extend: 'Ext.tree.Panel',
+  constructor: function (config) {
+    this.callParent(arguments);
+    this.store.load();
+  },
   id: 'cmvtreepanel',
   viewConfig : {selectedItemCls : "even"},
   region: 'west',
@@ -7,7 +11,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   store:'treemembers',
   autoLoad: false,
   root: 'data',
-  rootVisible: false,
+  rootVisible: true,
   collapsible: true,
   collapseDirection: 'left',
   title: 'Projects',
@@ -97,4 +101,3 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     }
   }
 });
-
