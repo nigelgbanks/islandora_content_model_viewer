@@ -609,7 +609,7 @@ ContentModelViewer.setup.createStores = function() {
        text: properties.rootowner,
        iconCls: "peopleCModel",
        expanded: true,
-       pid: properties.pid
+       pid: properties.root
     }
   });
 }

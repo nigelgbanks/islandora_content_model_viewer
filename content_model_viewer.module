@@ -553,11 +553,13 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
     $xml_set = simplexml_load_string($query_results);
     $result = $xml_set->results->result[0];
     $variables['rootowner'] = $result->title . ' (' . $result->k0 . ')';
+    $root = $user_pid;
   }
   else {
     $variables['rootowner'] = $user->name;
+    $root = 'si:root';
   }
-  $variables['root'] = $pid;
+  $variables['root'] = $root;
   $variables['base_url'] = $base_url;
   $variables['dsid'] = 'SWF'; // Default viewer.
   $variables['view_function'] = 'loadFlexPlayer';
@@ -583,7 +585,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
       'view' => "viewer/pid/dsid/view"
     )
   );
- }
+}
 
 /**
  * Renders the Viewer for a given pid if possible.
