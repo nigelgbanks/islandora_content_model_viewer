@@ -509,12 +509,14 @@ function content_model_viewer_array_insert($arr, $insert, $position) {
  */
 function template_preprocess_content_model_viewer_iframe(array &$variables) {
   global $base_url;
-
+  global $user;
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'content_model_viewer', 'Collection');
+  module_load_include('inc', 'fedora_repository', 'CollectionClass');
   $variables['scripts'] = drupal_get_js('header', content_model_viewer_grab_js());
   $variables['styles'] = drupal_get_css(content_model_viewer_grab_css());
   $pid = $variables['pid'];
+
   if (isset($pid)) {
     $item = new Fedora_Item($pid);
     if ($item->exists()) {
@@ -529,6 +531,31 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   else {
     $variables['pid'] = $variables['label'] = '';
     $variables['is_collection'] = 'false';
+  }
+  $user_data = unserialize($user->data);
+  $user_pid = $user_data['islandora_user_pid'];
+
+  if ($user_pid) {
+    $itql_query = 'select $object $title
+      count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
+       and $sub_model <fedora-model:hasModel> $sub_parent_model
+       and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+       and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+       and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+       and $pid <fedora-model:hasModel> $child_model
+       and ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object))
+       minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      )
+      from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
+       and $object <mulgara:is> <info:fedora/' . $user_pid . '>)';
+    $collectionClass = new CollectionClass();
+    $query_results = $collectionClass->getRelatedItems(NULL, $itql_query);
+    $xml_set = simplexml_load_string($query_results);
+    $result = $xml_set->results->result[0];
+    $variables['rootowner'] = $result->title . ' (' . $result->k0 . ')';
+  }
+  else {
+    $variables['rootowner'] = $user->name;
   }
   $variables['root'] = $pid;
   $variables['base_url'] = $base_url;
@@ -556,7 +583,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
       'view' => "viewer/pid/dsid/view"
     )
   );
-}
+ }
 
 /**
  * Renders the Viewer for a given pid if possible.
@@ -564,6 +591,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
  * @param string $pid
  */
 function content_model_viewer($pid = NULL) {
+  global $user;
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   // Copied from islandora.
@@ -586,7 +614,8 @@ function content_model_viewer($pid = NULL) {
       $pid = variable_get('fedora_repository_pid', 'islandora:root');
     }
     else {
-      $pid = $user->islandora_user_pid;
+      $serialized_data = unserialize($user->data);
+      $pid = $serialized_data['islandora_user_pid'];
     }
   }
   return theme('content_model_viewer', $pid);

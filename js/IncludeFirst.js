@@ -88,6 +88,7 @@ ContentModelViewer.setup.initProperties = function() {
     }
   };
   // Set properties @todo get collection/focused from URL # if possible.
+  properties.rootowner = $('#rootowner').text();
   properties.root = $('#root').text();
   properties.pid = $('#pid').text();
   properties.pids = {
@@ -603,7 +604,13 @@ ContentModelViewer.setup.createStores = function() {
     sorters: [{
       property: 'text',
       direction: 'ASC'
-    }]
+    }],
+    root: {
+       text: properties.rootowner,
+       iconCls: "peopleCModel",
+       expanded: true,
+       pid: properties.pid
+    }
   });
 }
 

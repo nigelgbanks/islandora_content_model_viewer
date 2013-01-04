@@ -2,7 +2,6 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   extend: 'Ext.tree.Panel',
   constructor: function (config) {
     this.callParent(arguments);
-    this.store.load();
   },
   id: 'cmvtreepanel',
   viewConfig : {selectedItemCls : "even"},

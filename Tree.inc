@@ -64,7 +64,7 @@ class Tree {
     $requested_pid = (!isset($this->node) || $this->node == 'root') ? $this->root : $this->node;
     $this->getParents($this->pid); // Sets an instance variable used in other functions thoughout this function.
     $tree = $this->buildTree($requested_pid);
-    return json_encode(array('success' => TRUE, 'data' => $tree, 'root' => $requested_pid, 'parents' => $this->parents));
+    return json_encode(array('success' => TRUE, 'data' => $tree, 'parents' => $this->parents));
   }
 
   /**
