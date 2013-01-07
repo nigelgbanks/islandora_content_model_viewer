@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  *
@@ -289,8 +287,8 @@ function content_model_viewer_content_model_datastream_viewers() {
 function content_model_viewer_include_content_models() {
   $include_path = drupal_get_path('module', 'content_model_viewer') . "/models";
   $dir = opendir($include_path);
-  if ($dir !== false) {
-    while (($file = readdir($dir)) !== false) {
+  if ($dir !== FALSE) {
+    while (($file = readdir($dir)) !== FALSE) {
       if (preg_match('/\.inc$/', $file)) {
         require_once "$include_path/$file";
       }
@@ -319,8 +317,8 @@ function content_model_viewer_get_models() {
 function content_model_viewer_include_viewers() {
   $include_path = drupal_get_path('module', 'content_model_viewer') . "/viewers";
   $dir = opendir($include_path);
-  if ($dir !== false) {
-    while (($file = readdir($dir)) !== false) {
+  if ($dir !== FALSE) {
+    while (($file = readdir($dir)) !== FALSE) {
       if (preg_match('/\.inc$/', $file)) {
         require_once "$include_path/$file";
       }
@@ -481,7 +479,7 @@ function content_model_viewer_grab_css() {
           }
         }
         else {
-         unset($styles[$style]);
+          unset($styles[$style]);
         }
       }
     }
@@ -535,6 +533,16 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   $user_data = unserialize($user->data);
   $user_pid = $user_data['islandora_user_pid'];
 
+
+  if (in_array('administrator', $user->roles)) {
+    $root = variable_get('fedora_repository_pid', 'islandora:root');
+    $pid = $user_pid;
+  }
+  else {
+   $serialized_data = unserialize($user->data);
+   $root = $serialized_data['islandora_user_pid'];
+  }
+
   if ($user_pid) {
     $itql_query = 'select $object $title
       count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
@@ -552,12 +560,11 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
     $query_results = $collectionClass->getRelatedItems(NULL, $itql_query);
     $xml_set = simplexml_load_string($query_results);
     $result = $xml_set->results->result[0];
-    $variables['rootowner'] = $result->title . ' (' . $result->k0 . ')';
-    $root = $user_pid;
+    $variables['rootowner'] = $result->title;
+    $variables['si_user'] = $user_pid;
   }
   else {
     $variables['rootowner'] = $user->name;
-    $root = 'si:root';
   }
   $variables['root'] = $root;
   $variables['base_url'] = $base_url;
@@ -609,15 +616,6 @@ function content_model_viewer($pid = NULL) {
     $item = new fedora_item($pid);
     if (!$item->exists()) {
       $pid = NULL;
-    }
-  }
-  else {
-    if (in_array('administrator', $user->roles)) {
-      $pid = variable_get('fedora_repository_pid', 'islandora:root');
-    }
-    else {
-      $serialized_data = unserialize($user->data);
-      $pid = $serialized_data['islandora_user_pid'];
     }
   }
   return theme('content_model_viewer', $pid);
@@ -695,10 +693,10 @@ function content_model_viewer_iframe($pid = NULL) {
     PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS,
     PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES
   );
-  $show_manage_panel = false;
+  $show_manage_panel = FALSE;
   foreach ($manage_permissions as $permission) {
     if (user_access($permission)) {
-      $show_manage_panel = true;
+      $show_manage_panel = TRUE;
     }
   }
   if ($show_manage_panel) {

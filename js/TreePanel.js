@@ -95,6 +95,14 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     itemclick: {
       fn: function(view, record, item, index, event) {
         var pid = record.get('pid');
+        if (record.data.id == 'root') {
+          if (ContentModelViewer.properties.siUser) {
+            pid = ContentModelViewer.properties.siUser;
+          }
+          else {
+            pid = 'si:root';
+          }
+        }
         ContentModelViewer.functions.selectConcept(pid);
       }
     }
