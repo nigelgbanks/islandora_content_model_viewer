@@ -1,5 +1,8 @@
 Ext.define('ContentModelViewer.widgets.TreePanel', {
   extend: 'Ext.tree.Panel',
+  constructor: function (config) {
+    this.callParent(arguments);
+  },
   id: 'cmvtreepanel',
   viewConfig : {selectedItemCls : "even"},
   region: 'west',
@@ -7,7 +10,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   store:'treemembers',
   autoLoad: false,
   root: 'data',
-  rootVisible: false,
+  rootVisible: true,
   collapsible: true,
   collapseDirection: 'left',
   title: 'Projects',
@@ -92,9 +95,16 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     itemclick: {
       fn: function(view, record, item, index, event) {
         var pid = record.get('pid');
+        if (record.data.id == 'root') {
+          if (ContentModelViewer.properties.siUser) {
+            pid = ContentModelViewer.properties.siUser;
+          }
+          else {
+            pid = 'si:root';
+          }
+        }
         ContentModelViewer.functions.selectConcept(pid);
       }
     }
   }
 });
-

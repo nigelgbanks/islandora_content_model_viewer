@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  *
@@ -289,8 +287,8 @@ function content_model_viewer_content_model_datastream_viewers() {
 function content_model_viewer_include_content_models() {
   $include_path = drupal_get_path('module', 'content_model_viewer') . "/models";
   $dir = opendir($include_path);
-  if ($dir !== false) {
-    while (($file = readdir($dir)) !== false) {
+  if ($dir !== FALSE) {
+    while (($file = readdir($dir)) !== FALSE) {
       if (preg_match('/\.inc$/', $file)) {
         require_once "$include_path/$file";
       }
@@ -319,8 +317,8 @@ function content_model_viewer_get_models() {
 function content_model_viewer_include_viewers() {
   $include_path = drupal_get_path('module', 'content_model_viewer') . "/viewers";
   $dir = opendir($include_path);
-  if ($dir !== false) {
-    while (($file = readdir($dir)) !== false) {
+  if ($dir !== FALSE) {
+    while (($file = readdir($dir)) !== FALSE) {
       if (preg_match('/\.inc$/', $file)) {
         require_once "$include_path/$file";
       }
@@ -481,7 +479,7 @@ function content_model_viewer_grab_css() {
           }
         }
         else {
-         unset($styles[$style]);
+          unset($styles[$style]);
         }
       }
     }
@@ -509,11 +507,14 @@ function content_model_viewer_array_insert($arr, $insert, $position) {
  */
 function template_preprocess_content_model_viewer_iframe(array &$variables) {
   global $base_url;
+  global $user;
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'content_model_viewer', 'Collection');
+  module_load_include('inc', 'fedora_repository', 'CollectionClass');
   $variables['scripts'] = drupal_get_js('header', content_model_viewer_grab_js());
   $variables['styles'] = drupal_get_css(content_model_viewer_grab_css());
   $pid = $variables['pid'];
+
   if (isset($pid)) {
     $item = new Fedora_Item($pid);
     if ($item->exists()) {
@@ -529,7 +530,43 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
     $variables['pid'] = $variables['label'] = '';
     $variables['is_collection'] = 'false';
   }
-  $variables['root'] = variable_get('fedora_repository_pid', 'islandora:root');
+  $user_data = unserialize($user->data);
+  $user_pid = $user_data['islandora_user_pid'];
+
+
+  if (in_array('administrator', $user->roles)) {
+    $root = variable_get('fedora_repository_pid', 'islandora:root');
+    $pid = $user_pid;
+  }
+  else {
+   $serialized_data = unserialize($user->data);
+   $root = $serialized_data['islandora_user_pid'];
+  }
+
+  if ($user_pid) {
+    $itql_query = 'select $object $title
+      count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
+       and $sub_model <fedora-model:hasModel> $sub_parent_model
+       and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+       and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+       and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+       and $pid <fedora-model:hasModel> $child_model
+       and ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object))
+       minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      )
+      from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
+       and $object <mulgara:is> <info:fedora/' . $user_pid . '>)';
+    $collectionClass = new CollectionClass();
+    $query_results = $collectionClass->getRelatedItems(NULL, $itql_query);
+    $xml_set = simplexml_load_string($query_results);
+    $result = $xml_set->results->result[0];
+    $variables['rootowner'] = $result->title;
+    $variables['si_user'] = $user_pid;
+  }
+  else {
+    $variables['rootowner'] = $user->name;
+  }
+  $variables['root'] = $root;
   $variables['base_url'] = $base_url;
   $variables['dsid'] = 'SWF'; // Default viewer.
   $variables['view_function'] = 'loadFlexPlayer';
@@ -563,6 +600,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
  * @param string $pid
  */
 function content_model_viewer($pid = NULL) {
+  global $user;
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   // Copied from islandora.
@@ -655,10 +693,10 @@ function content_model_viewer_iframe($pid = NULL) {
     PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS,
     PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES
   );
-  $show_manage_panel = false;
+  $show_manage_panel = FALSE;
   foreach ($manage_permissions as $permission) {
     if (user_access($permission)) {
-      $show_manage_panel = true;
+      $show_manage_panel = TRUE;
     }
   }
   if ($show_manage_panel) {

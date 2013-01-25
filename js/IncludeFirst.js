@@ -88,6 +88,8 @@ ContentModelViewer.setup.initProperties = function() {
     }
   };
   // Set properties @todo get collection/focused from URL # if possible.
+  properties.rootowner = $('#rootowner').text();
+  properties.siUser = $('#si_user').text();
   properties.root = $('#root').text();
   properties.pid = $('#pid').text();
   properties.pids = {
@@ -596,6 +598,12 @@ ContentModelViewer.setup.createStores = function() {
   /**
    * Tree Store
    */
+  var icon = 'folder';
+  var rootowner = 'Root';
+  if (properties.root != 'si:root') {
+    icon = 'peopleCModel';
+    rootowner = properties.rootowner;
+  }
   Ext.create('Ext.data.TreeStore', {
     storeId:'treemembers',
     folderSort: false,
@@ -603,7 +611,13 @@ ContentModelViewer.setup.createStores = function() {
     sorters: [{
       property: 'text',
       direction: 'ASC'
-    }]
+    }],
+    root: {
+       text: rootowner,
+       iconCls: icon,
+       expanded: true,
+       pid: properties.root
+    }
   });
 }
 

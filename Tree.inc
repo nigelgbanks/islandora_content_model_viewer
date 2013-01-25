@@ -45,7 +45,7 @@ class Tree {
   public function __construct($pid, $node = null) {
     $this->pid = $pid;
     $this->node = ($node != 'root' && !empty($node)) ? substr($node, 0, -8) : $node; // Sanitize $node value
-    $this->root = variable_get('fedora_repository_pid', 'islandora:root');
+    $this->root = ($pid == variable_get('fedora_repository_pid', 'islandora:root')) ? variable_get('fedora_repository_pid', 'islandora:root') : $pid;
   }
 
   /**
