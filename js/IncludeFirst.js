@@ -600,7 +600,7 @@ ContentModelViewer.setup.createStores = function() {
    */
   var icon = 'folder';
   var rootowner = 'Root';
-  if (properties.root != 'si:root') {
+  if (properties.root == properties.siUser) {
     icon = 'peopleCModel';
     rootowner = properties.rootowner;
   }
