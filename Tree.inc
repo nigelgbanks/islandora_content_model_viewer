@@ -43,9 +43,16 @@ class Tree {
    * @param string $node
    */
   public function __construct($pid, $node = null) {
+    global $user;
     $this->pid = $pid;
     $this->node = ($node != 'root' && !empty($node)) ? substr($node, 0, -8) : $node; // Sanitize $node value
-    $this->root = ($pid == variable_get('fedora_repository_pid', 'islandora:root')) ? variable_get('fedora_repository_pid', 'islandora:root') : $pid;
+    if (in_array('administrator', $user->roles)) {
+      $this->root = variable_get('fedora_repository_pid', 'islandora:root');
+    }
+    else {
+      $serialized_data = unserialize($user->data);
+      $this->root = $serialized_data['islandora_user_pid'];
+    }
   }
 
   /**
