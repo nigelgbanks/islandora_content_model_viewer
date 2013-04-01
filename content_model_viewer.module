@@ -1088,7 +1088,7 @@ function content_model_viewer_remove_from_collection($pid, $value) {
   /*$item = new Fedora_Item($pid);
   $item->purge_relationship('rel:isMemberOf', $value);
   $item->purge_relationship('rel:isMemberOfCollection', $value);*/
-  sidora_remove_relationship($pid, $value);
+  sidora_remove_relationship($value, $pid);
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
   exit();
 }
