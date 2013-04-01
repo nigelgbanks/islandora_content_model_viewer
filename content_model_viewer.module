@@ -1069,7 +1069,7 @@ function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hack
 function content_model_viewer_remove_from_collection($pid, $value) {
   module_load_include('inc', 'fedora_repository', 'CollectionClass');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'sidora', 'include/utils');
+  module_load_include('inc', 'sidora', 'includes/utils'); 
   /*$query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
     and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $o
     or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf>';
