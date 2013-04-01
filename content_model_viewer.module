@@ -1069,7 +1069,8 @@ function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hack
 function content_model_viewer_remove_from_collection($pid, $value) {
   module_load_include('inc', 'fedora_repository', 'CollectionClass');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+  module_load_include('inc', 'sidora', 'include/utils');
+  /*$query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
     and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $o
     or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf>';
   $collection = new CollectionClass();
@@ -1083,10 +1084,11 @@ function content_model_viewer_remove_from_collection($pid, $value) {
       echo json_encode(array('success' => FALSE, 'msg' => t('Object cannot be orphaned')));
       exit();
     }
-  }
-  $item = new Fedora_Item($pid);
+  }*/
+  /*$item = new Fedora_Item($pid);
   $item->purge_relationship('rel:isMemberOf', $value);
-  $item->purge_relationship('rel:isMemberOfCollection', $value);
+  $item->purge_relationship('rel:isMemberOfCollection', $value);*/
+  sidora_remove_relationship($pid, $value);
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
   exit();
 }
