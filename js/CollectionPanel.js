@@ -370,29 +370,9 @@ Ext.onReady(function(){
       }));
       
       		  this.addDocked(Ext.create('Ext.toolbar.Toolbar', {
-        itemId: 'toolbar',
+        itemId: 'associate',
         dock: 'top',
         items: [{
-          xtype: 'tbtext',
-          text: 'Sort By: '
-        }, Ext.create('Ext.Action', {
-          text : sorter.label(),
-          handler: function(action, event) {
-            sorter.toggleType();
-            action.setText(sorter.label());
-            sorter.refresh();
-          }
-        }), {
-          xtype: 'sortbutton',
-          text : sorter.direction(),
-          listeners: {
-            changeDirection: function(direction) {
-              sorter.toggleDirection();
-              this.setText(sorter.direction());
-              sorter.refresh();
-            }
-          }
-        }, {
           xtype: 'tbtext',
           text: 'Search'
         }, {
