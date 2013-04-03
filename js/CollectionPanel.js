@@ -368,6 +368,61 @@ Ext.onReady(function(){
 		      this.callParent(arguments);
         }
       }));
+      
+      		  this.addDocked(Ext.create('Ext.toolbar.Toolbar', {
+        itemId: 'toolbar',
+        dock: 'top',
+        items: [{
+          xtype: 'tbtext',
+          text: 'Sort By: '
+        }, Ext.create('Ext.Action', {
+          text : sorter.label(),
+          handler: function(action, event) {
+            sorter.toggleType();
+            action.setText(sorter.label());
+            sorter.refresh();
+          }
+        }), {
+          xtype: 'sortbutton',
+          text : sorter.direction(),
+          listeners: {
+            changeDirection: function(direction) {
+              sorter.toggleDirection();
+              this.setText(sorter.direction());
+              sorter.refresh();
+            }
+          }
+        }, {
+          xtype: 'tbtext',
+          text: 'Search'
+        }, {
+          xtype: 'textfield',
+          hideLabel: true,
+	  width: 200
+        }, {
+          xtype: 'button',
+          text: 'Go',
+          handler: function(button, event) {
+            var filters = store.filters;
+            var label = filters.get(0);
+            var toolbar = button.up('toolbar');
+            var search = toolbar.down('textfield');
+            var value = Ext.String.trim(search.getValue());
+            label.value = value != '' ? value : null;
+            store.load();
+          }
+        }, '->', {
+          xtype: 'button',
+          text: 'Add a new Resource',
+          handler: function(button, event) {
+            ContentModelViewer.functions.loadAddResourceForm();
+          }
+        }],
+        constructor: function(config) {
+		      this.callParent(arguments);
+        }
+      }));      
+      
 		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'top', displayInfo: true, itemId: 'top-pager' }));
       this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'bottom', displayInfo: true, itemId: 'bottom-pager' }));
 	  },
