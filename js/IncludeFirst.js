@@ -282,6 +282,21 @@ ContentModelViewer.setup.defineFunctions = function() {
         }
       });
     },
+    
+    loadLinkResourceForm: function () {
+      var cmv = this;
+      var url = ContentModelViewer.properties.url.object.add(ContentModelViewer.properties.pids.concept, 'concept');
+      Ext.getCmp('cmvtabpanel').getComponent('concept-overview').loadAddObjectContent(url, '#sidora-associate-concepts-form', function(loader, response, options) {
+        if(response.responseText != undefined) {
+          var data = JSON.parse(response.responseText);
+          if(data.refresh) {
+            cmv.refreshResource();
+            cmv.refreshResources();
+          }
+        }
+      });
+    },
+    
     loadResourceEditMetadataForm: function () {
       var cmv = this;
       Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditMetadataContent('#resource-metadata-form form', function(loader, response, options) {

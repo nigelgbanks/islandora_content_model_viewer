@@ -393,9 +393,9 @@ Ext.onReady(function(){
           }
         }, '->', {
           xtype: 'button',
-          text: 'Add a new Resource',
+          text: 'Link a new Resource',
           handler: function(button, event) {
-            ContentModelViewer.functions.loadAddResourceForm();
+            ContentModelViewer.functions.loadLinkResourceForm();
           }
         }],
         constructor: function(config) {
