@@ -130,7 +130,7 @@ class Collection {
      and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:hasModel> $child_model
-     and ($pid <fedora-rels-ext:hasConcept> $object or $pid <fedora-rels-ext:hasResource> $object))
+     and ($pid <fedora-rels-ext:hasConcept> $object))
      minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
     )
     from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
@@ -501,7 +501,7 @@ class Collection {
       $pid = $result['pid'];
       $type = $this->getType($pid);
       if ($show_type) {
-        $result['label'] = "{$type}: {$result['label']}";
+        $result['label'] = "{$type}: {$result['title']}";
         $result['originalMetadata'] = $this->isMetadataOriginal($pid);
       }
       $result['tn'] = $this->getThumbnail($pid, $type);
