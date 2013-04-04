@@ -367,41 +367,7 @@ Ext.onReady(function(){
         constructor: function(config) {
 		      this.callParent(arguments);
         }
-      }));
-      
-      		  this.addDocked(Ext.create('Ext.toolbar.Toolbar', {
-        itemId: 'associate',
-        dock: 'top',
-        items: [{
-          xtype: 'tbtext',
-          text: 'Search'
-        }, {
-          xtype: 'textfield',
-          hideLabel: true,
-	  width: 200
-        }, {
-          xtype: 'button',
-          text: 'Go',
-          handler: function(button, event) {
-            var filters = store.filters;
-            var label = filters.get(0);
-            var toolbar = button.up('toolbar');
-            var search = toolbar.down('textfield');
-            var value = Ext.String.trim(search.getValue());
-            label.value = value != '' ? value : null;
-            store.load();
-          }
-        }, '->', {
-          xtype: 'button',
-          text: 'Link a new Resource',
-          handler: function(button, event) {
-            ContentModelViewer.functions.loadLinkResourceForm();
-          }
-        }],
-        constructor: function(config) {
-		      this.callParent(arguments);
-        }
-      }));      
+      }));   
       
 		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'top', displayInfo: true, itemId: 'top-pager' }));
       this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'bottom', displayInfo: true, itemId: 'bottom-pager' }));

@@ -1088,7 +1088,51 @@ function content_model_viewer_remove_from_collection($pid, $value) {
   /*$item = new Fedora_Item($pid);
   $item->purge_relationship('rel:isMemberOf', $value);
   $item->purge_relationship('rel:isMemberOfCollection', $value);*/
-  sidora_remove_relationship($pid, $value);
+  
+  $repo = tuque_wrapper_get_repository_instance();
+  
+  try {
+    $description = $repo->api->a->describeRepository(); // Check for repository access
+    $child = $repo->getObject($related); // Check for object access
+    $is_concept = in_array('si:conceptCModel', $child->models);
+    $predicate = 'hasResource';
+    if ($is_concept) {
+      $predicate = 'hasConcept';   
+    }
+      sidora_update_relationship(RELS_EXT_URI, $predicate, $recipient, $related, FALSE);
+  
+  } catch(Exception $e) {
+    $code = $e->getCode();
+    switch($code) {
+      case '404':
+        if(!isset($description)) { // Couldn't reach the repository.
+          drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
+        }
+        drupal_not_found();
+        break;
+      case '401':
+      case '403':
+        drupal_access_denied();
+        break;
+      default:
+        drupal_set_message(t('An error occured when attempting to access the fedora repository. Please contact the site administrator.'), 'error', FALSE);
+        $message = '%type: !message in %function (line %line of %file).';
+        $backtrace = $e->getTrace();
+        $caller = $backtrace[1];
+        $variables = array(
+          '%type' => get_class($e),
+          '!message' => check_plain($e->getMessage()),
+          '%function' => $caller['function'],
+          '%file' => $caller['file'],
+          '%line' => $caller['line']
+        );
+        watchdog('islandora', $message, $variables, WATCHDOG_ERROR, NULL);
+        drupal_not_found();
+        break;
+    }
+    exit();
+  }
+  
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
   exit();
 }
