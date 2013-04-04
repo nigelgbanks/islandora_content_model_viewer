@@ -139,8 +139,7 @@ class Collection {
      and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
      and $object <fedora-model:createdDate> $created
      and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and (<info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object
-     or <info:fedora/' . $this->pid . '> <fedora-rels-ext:hasResource> $object))
+     and (<info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object))
      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
      minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
      minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
