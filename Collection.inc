@@ -501,7 +501,7 @@ class Collection {
       $pid = $result['pid'];
       $type = $this->getType($pid);
       if ($show_type) {
-        $result['label'] = "{$type}: {$result['title']}";
+        $result['label'] = "{$type}: {$result['label']}";
         $result['originalMetadata'] = $this->isMetadataOriginal($pid);
       }
       $result['tn'] = $this->getThumbnail($pid, $type);
