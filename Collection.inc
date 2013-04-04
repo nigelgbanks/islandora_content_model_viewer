@@ -252,9 +252,19 @@ class Collection {
                         and $parent_model <mulgara:is> <info:fedora/islandora:resourceCModel>
                         and $object <fedora-model:createdDate> $created
                         and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+                        and (<info:fedora/' . $this->pid . '><fedora-rels-ext:hasResource> $object))
+                        order by $title';
+                        
+    /*$query = 'select $object $title $model $parent_model $created from <#ri>
+                        where ($object <info:fedora/fedora-system:def/model#label> $title
+                        and $object <fedora-model:hasModel> $model
+                        and $model <fedora-model:hasModel> $parent_model
+                        and $parent_model <mulgara:is> <info:fedora/islandora:resourceCModel>
+                        and $object <fedora-model:createdDate> $created
+                        and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                         and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
                         or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                        order by $title';
+                        order by $title';*/
     /* $query = 'select $object $title $model $parent_model $created from <#ri>
       where ($object <info:fedora/fedora-system:def/model#label> $title
       and $object <fedora-model:hasModel> $model
