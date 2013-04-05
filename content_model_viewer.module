@@ -1491,6 +1491,31 @@ function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$
   if ($form_state['storage']['step'] == 2) {
     $ingest_form = new IngestObjectMetadataForm();
     $ingest_form->submit($form, $form_state);
+    
+    //TODO we need to remove the default ismemberofcollection relationship and go to a new format of hasConcept or hasResource. This needs to change HACK HACK
+    $parent_pid = $form_state['values']['collection_pid']    
+    $child_pid = $form_state['values']['pid']
+    $repo = tuque_wrapper_get_repository_instance();
+    $parent = $repo->getObject($parent_pid); 
+    $child = $repo->getObject($child_pid);
+    //remove ismember if collection from child
+    $child->relationships->remove(RELS_EXT_URI, 'isMemberOfCollection', $parent_pid);
+    
+    $is_imageCModel = in_array('si:imageCModel', $child->models);
+    $is_fieldbookCModel = in_array('si:fieldbookCModel', $child->models);
+    $is_datasetCModel = in_array('si:datasetCModel', $child->models);
+    
+    $predicate = 'hasConcept';
+    $model = 'si:conceptCModel'; 
+    if ($is_imageCModel || $is_fieldbookCModel || $is_datasetCModel) {
+      $predicate = 'hasResource'; 
+      $model = 'si:resourceCModel';  
+    }
+    $parent->relationships->add(RELS_EXT_URI, $predicate, $child_pid);
+    
+    $child->relationships->add(FEDORA_MODEL_URI, 'hasModel', $model);
+    //*********************************************************************************
+    
     $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
   }
   $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
