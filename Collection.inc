@@ -124,18 +124,18 @@ class Collection {
   public function getTreeMembers() {
     
   $query = 'select $object $title $created 
-    count(select  $object $title $created 
+count(select  $object $title $created 
     from <#ri>
     where ($object <info:fedora/fedora-system:def/model#label> $title
     and $object <fedora-model:createdDate> $created
     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($object <fedora-rels-ext:hasConcept> $object))
+    and ($object <fedora-rels-ext:hasConcept> $object))   
     )
     from <#ri>
     where ($object <info:fedora/fedora-system:def/model#label> $title
     and $object <fedora-model:createdDate> $created
     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and (<info:fedora/si-user:86> <fedora-rels-ext:hasConcept> $object))
+    and (<' . $this->pid . '> <fedora-rels-ext:hasConcept> $object))
     order by $title';    
 
     $results = $this->query($query);
@@ -592,21 +592,3 @@ class Collection {
   }
 
 }
-b_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and $pid <fedora-model:hasModel> $child_model
-     and ($pid <fedora-rels-ext:hasConcept> $object))
-     minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-    )
-    from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
-     and $object <fedora-model:hasModel> $model
-     and $model <fedora-model:hasModel> $parent_model
-     and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-     and $object <fedora-model:createdDate> $created
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and (<info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object))
-     minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-     minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-     minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-     order by $title'; 
