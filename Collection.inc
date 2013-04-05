@@ -131,7 +131,7 @@ class Collection {
      and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:hasModel> $child_model
      and ($pid <fedora-rels-ext:hasConcept> $object))
-     minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+
     )
     from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
      and $object <fedora-model:hasModel> $model
