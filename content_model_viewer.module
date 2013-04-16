@@ -1493,8 +1493,8 @@ function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$
     $ingest_form->submit($form, $form_state);
     
     //TODO we need to remove the default ismemberofcollection relationship and go to a new format of hasConcept or hasResource. This needs to change HACK HACK
-    $parent_pid = $form_state['values']['collection_pid']    
-    $child_pid = $form_state['values']['pid']
+    $parent_pid = $form_state['values']['collection_pid'];    
+    $child_pid = $form_state['values']['pid'];
     $repo = tuque_wrapper_get_repository_instance();
     $parent = $repo->getObject($parent_pid); 
     $child = $repo->getObject($child_pid);
