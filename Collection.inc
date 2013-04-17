@@ -123,26 +123,14 @@ class Collection {
 
   public function getTreeMembers() {
     
-  $query = 'select $object $title 
-    count(select $pid from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and ($object <fedora-rels-ext:hasConcept> $pid))
-    )
-
-    from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and (<info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object))
-     order by $title';
-       
-    
-  /*$query = 'select $object $title $model $created $parent_model
+  $query = 'select $object $title $model $created $parent_model
     count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
      and $sub_model <fedora-model:hasModel> $sub_parent_model
      and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
      and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
      and $pid <fedora-model:hasModel> $child_model
-     and ($pid <fedora-rels-ext:hasConcept> $object))
+     and ($object <fedora-rels-ext:hasConcept> $pid))
      minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
     )
     from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
@@ -155,7 +143,7 @@ class Collection {
      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
      minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
      minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-     order by $title';  */  
+     order by $title'; 
 
     $results = $this->query($query);
     $results = $this->populate($results);
