@@ -1093,7 +1093,7 @@ function content_model_viewer_remove_from_collection($pid, $value) {
   
   try {
     $description = $repo->api->a->describeRepository(); // Check for repository access
-    $child = $repo->getObject($related); // Check for object access
+    $child = $repo->getObject($value); // Check for object access
     $is_concept = in_array('si:conceptCModel', $child->models);
     $predicate = 'hasResource';
     if ($is_concept) {
