@@ -20,7 +20,15 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     var nodes = [];
     if(typeof(pid) == 'string' && pid.length > 0) {
       var root = this.store.getRootNode();
-      root.cascadeBy(function(n) { if(n.get('pid') == pid) { nodes.push(n); } });
+      var cascadeFunc = function(n) {
+        console.debug("NODES PID: " + n.get('pid'));
+        console.debug("TARGET PID: " + pid);
+        if(n.get('pid') == pid) { 
+          nodes.push(n); 
+        }
+        return true;
+      }
+      root.cascadeBy(cascadeFunc);
     }
     return nodes;
   },
@@ -53,14 +61,11 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
         this.loadPid(pid);
       }
       else {
-        this.loadNodes(this.getNodesByPid(pid));
+        this.store.load({
+          url: ContentModelViewer.properties.url.object.treemembers(this.refreshNodes(pid)),
+        });
       }
     }
-    /*else {
-      this.store.load({
-        url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root),
-      });
-    }*/
   },
   refreshParents: function(pid) {
     if(pid != undefined) {
