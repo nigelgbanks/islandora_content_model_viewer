@@ -1093,13 +1093,19 @@ function content_model_viewer_remove_from_collection($pid, $value) {
   
   try {
     $description = $repo->api->a->describeRepository(); // Check for repository access
-    $child = $repo->getObject($value); // Check for object access
-    $is_concept = in_array('si:conceptCModel', $child->models);
-    $predicate = 'hasResource';
-    if ($is_concept) {
-      $predicate = 'hasConcept';   
+    $child = $repo->getObject($pid); // Check for object access
+    $is_resource = in_array('si:resourceCModel', $child->models);
+    
+    $predicate = 'hasConcept';
+    $recipient = $pid;
+    $related = $value;
+    if ($is_resource) {
+      $predicate = 'hasResource';
+      $recipient = $value;
+      $related = $pid;
+ 
     }
-      sidora_update_relationship(RELS_EXT_URI, $predicate, $pid, $value, TRUE);
+    sidora_update_relationship(RELS_EXT_URI, $predicate, $recipient, $related, TRUE);
   
   } catch(Exception $e) {
     $code = $e->getCode();

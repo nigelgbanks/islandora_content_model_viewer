@@ -154,7 +154,7 @@ class Collection {
     $query = 'select $object $title count(select $pid from <#ri> where $object <fedora-model:hasModel> $sub_model and $sub_model <fedora-model:hasModel> $sub_parent_model
               and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel> and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
               and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active> and
-              ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object ))
+              ($object <fedora-rels-ext:hasConcept> $pid))
               from <#ri> where ($object <mulgara:is>  <info:fedora/' . $pid . '> and $object <info:fedora/fedora-system:def/model#label> $title)';
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
     $collection = new CollectionClass();
