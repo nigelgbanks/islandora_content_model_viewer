@@ -922,11 +922,16 @@ function content_model_viewer_treemembers($pid) {
 
 function content_model_viewer_treemember($pid) {
   module_load_include('inc', 'content_model_viewer', 'Collection');
-  module_load_include('inc', 'content_model_viewer', 'Collection');
+  module_load_include('inc', 'content_model_viewer', 'Tree');
+  $tree = new Tree($pid, $pid . '|||00000');
+  $nodeInfo =  $tree->getTree();
+  $nodeInfo = json_decode($nodeInfo);
   $collection = new Collection($pid);
   list($label, $count) = $collection->getChildCount($pid);
   $count = $count > 0 ? ' (' . $count . ')' : '';
-  echo  json_encode(array('label' => $label . $count));
+  $nodeInfo->parents = array('label' => $label . $count);
+  
+  echo  json_encode($nodeInfo);
   exit();
 }
 
