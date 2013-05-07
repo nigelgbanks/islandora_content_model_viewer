@@ -282,31 +282,6 @@ ContentModelViewer.setup.defineFunctions = function() {
         }
       });
     },
-    
-    loadLinkResourceForm: function () {
-      var cmv = this;
-      var overview = Ext.getCmp('cmvtabpanel').getComponent('resource-overview');
-      var url = ContentModelViewer.properties.url.object.add(ContentModelViewer.properties.pids.concept, 'resource');
-      var form_selector = '#sidora-associate-concepts-form';
-      var success = function(loader, response, options) {
-        if(response.responseText != undefined) {
-          var data = JSON.parse(response.responseText);
-          if(data.refresh) {
-            cmv.refreshTreeNodes(ContentModelViewer.properties.pids.concept); // Update the number in the tree
-            cmv.selectResource(data.refresh); // Should be newly created object.
-            cmv.refreshResources(); // Show object in page if possible.
-          }
-        }
-      }
-      if(!overview) {
-        this.loadResource({ url: url });
-      }
-      else {
-        overview.loadAddObjectContent(url, form_selector, success);
-      }
-      this.showResource();
-    },
-    
     loadResourceEditMetadataForm: function () {
       var cmv = this;
       Ext.getCmp('cmvtabpanel').getComponent('resource-overview').loadEditMetadataContent('#resource-metadata-form form', function(loader, response, options) {
