@@ -930,7 +930,7 @@ function content_model_viewer_treemember($pid) {
   list($label, $count) = $collection->getChildCount($pid);
   $count = $count > 0 ? ' (' . $count . ')' : '';
   $nodeInfo->parents = array('label' => $label . $count);
-  
+
   echo  json_encode($nodeInfo);
   exit();
 }
@@ -1074,33 +1074,14 @@ function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hack
 function content_model_viewer_remove_from_collection($pid, $value) {
   module_load_include('inc', 'fedora_repository', 'CollectionClass');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'sidora', 'includes/utils'); 
-  /*$query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $o
-    or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf>';
-  $collection = new CollectionClass();
-  $results = $collection->getRelatedItems($pid, $query);
-  $results = trim($results);
-  if ($results != '') {
-    $xml = simplexml_load_string($results);
-    $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
-    $parents = $xml->xpath("//ns:result/ns:o/@uri");
-    if (count($parents) < 2) {
-      echo json_encode(array('success' => FALSE, 'msg' => t('Object cannot be orphaned')));
-      exit();
-    }
-  }*/
-  /*$item = new Fedora_Item($pid);
-  $item->purge_relationship('rel:isMemberOf', $value);
-  $item->purge_relationship('rel:isMemberOfCollection', $value);*/
-  
+  module_load_include('inc', 'sidora', 'includes/utils');
   $repo = tuque_wrapper_get_repository_instance();
-  
+
   try {
     $description = $repo->api->a->describeRepository(); // Check for repository access
     $child = $repo->getObject($pid); // Check for object access
     $is_resource = in_array('si:resourceCModel', $child->models);
-    
+
     $predicate = 'hasConcept';
     $recipient = $pid;
     $related = $value;
@@ -1108,15 +1089,15 @@ function content_model_viewer_remove_from_collection($pid, $value) {
       $predicate = 'hasResource';
       $recipient = $value;
       $related = $pid;
- 
+
     }
     sidora_update_relationship(RELS_EXT_URI, $predicate, $recipient, $related, TRUE);
-  
+
   } catch(Exception $e) {
     $code = $e->getCode();
-    switch($code) {
+    switch ($code) {
       case '404':
-        if(!isset($description)) { // Couldn't reach the repository.
+        if (!isset($description)) { // Couldn't reach the repository.
           drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
         }
         drupal_not_found();
@@ -1143,7 +1124,7 @@ function content_model_viewer_remove_from_collection($pid, $value) {
     }
     exit();
   }
-  
+
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
   exit();
 }
@@ -1476,7 +1457,7 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
             file_delete($file);
             return;
           }
-          else if (!$content_model->execIngestRules($file, $format)) {
+          elseif (!$content_model->execIngestRules($file, $format)) {
             drupal_set_message(t('Error following Content Model Rules'), 'error');
             foreach (ContentModel::$errors as $error) {
               drupal_set_message($error, 'error');
@@ -1502,31 +1483,30 @@ function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$
   if ($form_state['storage']['step'] == 2) {
     $ingest_form = new IngestObjectMetadataForm();
     $ingest_form->submit($form, $form_state);
-    
+
     //TODO we need to remove the default ismemberofcollection relationship and go to a new format of hasConcept or hasResource. This needs to change HACK HACK
-    $parent_pid = $form_state['values']['collection_pid'];    
+    $parent_pid = $form_state['values']['collection_pid'];
     $child_pid = $form_state['values']['pid'];
     $repo = tuque_wrapper_get_repository_instance();
-    $parent = $repo->getObject($parent_pid); 
+    $parent = $repo->getObject($parent_pid);
     $child = $repo->getObject($child_pid);
     //remove ismember if collection from child
     $child->relationships->remove(RELS_EXT_URI, 'isMemberOfCollection', $parent_pid);
-    
+
     $is_imageCModel = in_array('si:imageCModel', $child->models);
     $is_fieldbookCModel = in_array('si:fieldbookCModel', $child->models);
     $is_datasetCModel = in_array('si:datasetCModel', $child->models);
-    
+
     $predicate = 'hasConcept';
-    $model = 'si:conceptCModel'; 
+    $model = 'si:conceptCModel';
     if ($is_imageCModel || $is_fieldbookCModel || $is_datasetCModel) {
-      $predicate = 'hasResource'; 
-      $model = 'si:resourceCModel';  
+      $predicate = 'hasResource';
+      $model = 'si:resourceCModel';
     }
     $parent->relationships->add(RELS_EXT_URI, $predicate, $child_pid);
-    
+
     $child->relationships->add(FEDORA_MODEL_URI, 'hasModel', $model);
-    //*********************************************************************************
-    
+
     $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
   }
   $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
