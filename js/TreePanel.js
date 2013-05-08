@@ -20,7 +20,13 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     var nodes = [];
     if(typeof(pid) == 'string' && pid.length > 0) {
       var root = this.store.getRootNode();
-      root.cascadeBy(function(n) { if(n.get('pid') == pid) { nodes.push(n); } });
+      var cascadeFunc = function(n) {
+        if(n.get('pid') == pid) {
+          nodes.push(n);
+        }
+        return true;
+      }
+      root.cascadeBy(cascadeFunc);
     }
     return nodes;
   },
@@ -53,14 +59,11 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
         this.loadPid(pid);
       }
       else {
-        this.loadNodes(this.getNodesByPid(pid));
+        this.store.load({
+          url: ContentModelViewer.properties.url.object.treemembers(pid),
+        });
       }
     }
-    /*else {
-      this.store.load({
-        url: ContentModelViewer.properties.url.object.treemembers(ContentModelViewer.properties.root),
-      });
-    }*/
   },
   refreshParents: function(pid) {
     if(pid != undefined) {
@@ -69,19 +72,28 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   },
   refreshNodes: function(pid) {
     var nodes = this.getNodesByPid(pid);
-    for(var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
+    if (nodes.length > 0) {
       Ext.Ajax.request({
-        url: ContentModelViewer.properties.url.object.treemember(node.get('pid')),
+        url: ContentModelViewer.properties.url.object.treemember(pid),
         success: function(response){
-          var data = JSON.parse(response.responseText);
-          node.set('text', data.label);
-          node.set('leaf', false); // May have added a child.
-          node.commit();
+          var responseData = JSON.parse(response.responseText);
+          var children = responseData.data;
+          for(var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            node.removeAll();
+            if (children == null) {
+            children = [];
+            }
+            node.appendChild(children);
+            node.set('text', responseData.parents.label);
+            node.set('leaf', false); // May have added a child.
+            node.commit();
+          }
         }
       });
     }
   },
+
   removeChildFromParent: function(object_pid, parent_pid) {
     var parents = this.getNodesByPid(parent_pid);
     for(var i = 0; i < parents.length; i++) {

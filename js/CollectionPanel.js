@@ -367,7 +367,8 @@ Ext.onReady(function(){
         constructor: function(config) {
 		      this.callParent(arguments);
         }
-      }));
+      }));   
+      
 		  this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'top', displayInfo: true, itemId: 'top-pager' }));
       this.addDocked(Ext.create('Ext.toolbar.Paging', { store: store, dock: 'bottom', displayInfo: true, itemId: 'bottom-pager' }));
 	  },
