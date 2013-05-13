@@ -1010,7 +1010,13 @@ function content_model_viewer_purge_object($pid) {
   $message = t('Failed to delete object');
   if (array_search($state, $active_states) !== FALSE) {
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
-    $query = 'select $o $p from <#ri> where ($o <fedora-rels-ext:isMemberOfCollection> $p and $o <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $pid . '> and $o <fedora-model:hasModel> $m and $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>) minus $m <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
+    $query = 'select $o 
+      from <#ri> 
+      where ($o <fedora-rels-ext:hasResource> <info:fedora/' .$pid . '> 
+      and $o <fedora-model:hasModel> $m 
+      and $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>) 
+      minus $m <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
+      
     $collection = new CollectionClass();
     $results = $collection->getRelatedItems($pid, $query);
     $results = trim($results);
