@@ -276,7 +276,6 @@ ContentModelViewer.setup.defineFunctions = function() {
           var data = JSON.parse(response.responseText);
           if(data.refresh) {
             cmv.refreshTreeNodes(ContentModelViewer.properties.pids.concept); // Update the object we were previously on
-            cmv.refreshTree(ContentModelViewer.properties.pids.concept);
             cmv.selectConcept(data.refresh); // Should be newly created object.
           }
         }

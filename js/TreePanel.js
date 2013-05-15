@@ -45,7 +45,6 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     for(var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       this.refreshNodes(node.get('pid'));
-      this.loadPid(node.get('pid'));
     }
   },
   loadPid: function(pid) {
@@ -81,10 +80,10 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
           for(var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
             node.removeAll();
-            if (children == null) {
-            children = [];
-            }
+            if (children != null) {
             node.appendChild(children);
+            }
+            
             node.set('text', responseData.parents.label);
             node.set('leaf', false); // May have added a child.
             node.commit();
