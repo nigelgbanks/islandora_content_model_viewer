@@ -1023,7 +1023,7 @@ function content_model_viewer_purge_object($pid) {
       $child_count = count($children_concepts) + count($children_resources);
   
       if ($parent_count == 1 && $child_count == 0) { // All child concepts/resource belong to other concepts
-        sidora_update_relationship(RELS_EXT_URI, 'hasConcept', key($parent), $pid, TRUE);
+        sidora_update_relationship(RELS_EXT_URI, 'hasConcept', key($parents), $pid, TRUE);
         $success = $properties->setState('D');
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
