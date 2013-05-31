@@ -1001,47 +1001,87 @@ function content_model_viewer_properties($pid) {
  * @return string
  */
 function content_model_viewer_purge_object($pid) {
+  module_load_include('inc', 'sidora', 'includes/utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'content_model_viewer', 'ObjectProperties');
+  
   $active_states = array('A', 'I');
   $properties = new ObjectProperties($pid);
   $state = $properties->state;
   $success = FALSE;
-  $message = t('Failed to delete object');
+  
   if (array_search($state, $active_states) !== FALSE) {
-    module_load_include('inc', 'fedora_repository', 'CollectionClass');
-    $query = 'select $o 
-      from <#ri> 
-      where ($o <fedora-rels-ext:hasResource> <info:fedora/' .$pid . '> 
-      and $o <fedora-model:hasModel> $m 
-      and $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>) 
-      minus $m <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
-      
-    $collection = new CollectionClass();
-    $results = $collection->getRelatedItems($pid, $query);
-    $results = trim($results);
-    if ($results != '') {
-      $xml = simplexml_load_string($results);
-      $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
-      $children = $xml->xpath("//ns:result/ns:o/@uri"); // Each unique child ignore another parents.
-      $counts = array();
-      foreach ($children as $child) {
-        $counts[(string)$child]++;
-      }
-      if (empty($counts) || min($counts) > 1) { // All child concepts/resource belong to other concepts
+    $parents = sidora_get_parents($pid);
+    $parent_count = count($parents);
+  
+    $repo = tuque_wrapper_get_repository_instance();
+  
+    try {
+      $description = $repo->api->a->describeRepository();
+      $object = $repo->getObject($pid); 
+      $children_concepts = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'hasConcept');
+      $children_resources = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'hasResource');
+      $child_count = count($children_concepts) + count($children_resources);
+  
+      if ($parent_count == 1 && $child_count == 0) { // All child concepts/resource belong to other concepts
         $success = $properties->setState('D');
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
       else {
-        $message = t('Failed to delete object. You cannot delete an object that is the sole parent of one or more Concepts/Resources.');
+        $fail_message = "Failed to delete object. ";
+      
+        if ($parent_count > 1 ) {
+          $other_parent_count = $parent_count - 1;
+          $fail_message .= "You cannot delete an object that has more than one parent.  There are $other_parent_count other parents, you must unlink. ";
+        }
+        if ($child_count != 0) {
+          $fail_message .= "You cannot delete an object that has more than one children.  There are $child_count children, you need to handle first. ";
+        }
+      
+        $message = t($fail_message);
       }
+      echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
+      exit();
+  
+    } catch(Exception $e) {
+      $code = $e->getCode();
+      switch($code) {
+        case '404':
+          if(!isset($description)) { // Couldn't reach the repository.
+            drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
+          }
+          drupal_not_found();
+          break;
+        case '401':
+        case '403':
+          drupal_access_denied();
+          break;
+        default:
+          drupal_set_message(t('An error occured when attempting to access the fedora repository. Please contact the site administrator.'), 'error', FALSE);
+          $message = '%type: !message in %function (line %line of %file).';
+          $backtrace = $e->getTrace();
+          $caller = $backtrace[1];
+          $variables = array(
+            '%type' => get_class($e),
+            '!message' => check_plain($e->getMessage()),
+            '%function' => $caller['function'],
+            '%file' => $caller['file'],
+            '%line' => $caller['line']
+          );
+          watchdog('islandora', $message, $variables, WATCHDOG_ERROR, NULL);
+          drupal_not_found();
+          break;
+      }
+      exit();
     }
+  
   }
   else {
     $message = t('Object does not exist or is in a in-active state.');
   }
-  echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
-  exit();
+  
+  
+  
+  
 }
 
 function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hacks!
