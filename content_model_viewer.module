@@ -1044,12 +1044,11 @@ function content_model_viewer_purge_object($pid) {
           if ($child_count == 1) {
             $count_text = "is $child_count child";
           }
-          $fail_message .= "You cannot delete an object that has more than one children.  There $child_text, you need to handle first. ";
+          $fail_message .= "You cannot delete an object that has more than one children.  There $count_text, you need to handle first. ";
         }
       
         $message = t($fail_message);
-      }
-     
+      }   
   
     } catch(Exception $e) {
       $code = $e->getCode();
@@ -1157,13 +1156,10 @@ function content_model_viewer_remove_from_collection($pid, $value) {
     $is_resource = in_array('si:resourceCModel', $child->models);
     
     $predicate = 'hasConcept';
-    $recipient = $pid;
-    $related = $value;
+    $recipient = $value;
+    $related = $pid;
     if ($is_resource) {
       $predicate = 'hasResource';
-      $recipient = $value;
-      $related = $pid;
- 
     }
     sidora_update_relationship(RELS_EXT_URI, $predicate, $recipient, $related, TRUE);
   
