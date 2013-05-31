@@ -1003,7 +1003,7 @@ function content_model_viewer_properties($pid) {
 function content_model_viewer_purge_object($pid) {
   module_load_include('inc', 'sidora', 'includes/utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  
+  module_load_include('inc', 'content_model_viewer', 'ObjectProperties');
   $active_states = array('A', 'I');
   $properties = new ObjectProperties($pid);
   $state = $properties->state;
@@ -1030,17 +1030,26 @@ function content_model_viewer_purge_object($pid) {
         $fail_message = "Failed to delete object. ";
       
         if ($parent_count > 1 ) {
+          
           $other_parent_count = $parent_count - 1;
-          $fail_message .= "You cannot delete an object that has more than one parent.  There are $other_parent_count other parents, you must unlink. ";
+          $count_text = "are $other_parent_count parents";
+          if ($other_parent_count == 1) {
+            $count_text = "is $other_parent_count parent";
+          }
+         
+          $fail_message .= "You cannot delete an object that has more than one parent.  There $count_text, you must unlink. ";
         }
         if ($child_count != 0) {
-          $fail_message .= "You cannot delete an object that has more than one children.  There are $child_count children, you need to handle first. ";
+          $count_text = "are $child_count children";
+          if ($child_count == 1) {
+            $count_text = "is $child_count child";
+          }
+          $fail_message .= "You cannot delete an object that has more than one children.  There $child_text, you need to handle first. ";
         }
       
         $message = t($fail_message);
       }
-      echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
-      exit();
+     
   
     } catch(Exception $e) {
       $code = $e->getCode();
@@ -1079,9 +1088,9 @@ function content_model_viewer_purge_object($pid) {
     $message = t('Object does not exist or is in a in-active state.');
   }
   
-  
-  
-  
+  echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
+  exit();
+ 
 }
 
 function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hacks!
