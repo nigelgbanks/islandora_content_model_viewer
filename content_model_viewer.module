@@ -1034,27 +1034,7 @@ function content_model_viewer_purge_object($pid) {
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
       else {
-        $fail_message = "Failed to delete object. ";
-      
-        if ($parent_count > 1 ) {
-          
-          $other_parent_count = $parent_count - 1;
-          $count_text = "are $other_parent_count parents";
-          if ($other_parent_count == 1) {
-            $count_text = "is $other_parent_count parent";
-          }
-         
-          $fail_message .= "You cannot delete an object that has more than one parent.  There $count_text, you must unlink. ";
-        }
-        if ($child_count != 0) {
-          $count_text = "are $child_count children";
-          if ($child_count == 1) {
-            $count_text = "is $child_count child";
-          }
-          $fail_message .= "You cannot delete an object that has more than one children.  There $count_text, you need to handle first. ";
-        }
-      
-        $message = t($fail_message);
+        $message = t('Failed to delete object. You cannot delete an object that is the sole parent of one or more Concepts/Resources.');
       }   
   
     } catch(Exception $e) {
