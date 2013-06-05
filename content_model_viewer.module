@@ -922,11 +922,16 @@ function content_model_viewer_treemembers($pid) {
 
 function content_model_viewer_treemember($pid) {
   module_load_include('inc', 'content_model_viewer', 'Collection');
-  module_load_include('inc', 'content_model_viewer', 'Collection');
+  module_load_include('inc', 'content_model_viewer', 'Tree');
+  $tree = new Tree($pid, $pid . '|||00000');
+  $nodeInfo =  $tree->getTree();
+  $nodeInfo = json_decode($nodeInfo);
   $collection = new Collection($pid);
   list($label, $count) = $collection->getChildCount($pid);
   $count = $count > 0 ? ' (' . $count . ')' : '';
-  echo  json_encode(array('label' => $label . $count));
+  $nodeInfo->parents = array('label' => $label . $count);
+
+  echo  json_encode($nodeInfo);
   exit();
 }
 
@@ -996,41 +1001,82 @@ function content_model_viewer_properties($pid) {
  * @return string
  */
 function content_model_viewer_purge_object($pid) {
+  module_load_include('inc', 'sidora', 'includes/utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'content_model_viewer', 'ObjectProperties');
   $active_states = array('A', 'I');
   $properties = new ObjectProperties($pid);
   $state = $properties->state;
   $success = FALSE;
-  $message = t('Failed to delete object');
+  
   if (array_search($state, $active_states) !== FALSE) {
-    module_load_include('inc', 'fedora_repository', 'CollectionClass');
-    $query = 'select $o $p from <#ri> where ($o <fedora-rels-ext:isMemberOfCollection> $p and $o <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $pid . '> and $o <fedora-model:hasModel> $m and $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>) minus $m <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
-    $collection = new CollectionClass();
-    $results = $collection->getRelatedItems($pid, $query);
-    $results = trim($results);
-    if ($results != '') {
-      $xml = simplexml_load_string($results);
-      $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
-      $children = $xml->xpath("//ns:result/ns:o/@uri"); // Each unique child ignore another parents.
-      $counts = array();
-      foreach ($children as $child) {
-        $counts[(string)$child]++;
-      }
-      if (empty($counts) || min($counts) > 1) { // All child concepts/resource belong to other concepts
+    $parents = sidora_get_parents($pid);
+    $parent_count = count($parents);
+  
+    $repo = tuque_wrapper_get_repository_instance();
+  
+    try {
+      $description = $repo->api->a->describeRepository();
+      $object = $repo->getObject($pid); 
+      $children_concepts = $object->relationships->get(RELS_EXT_URI, 'hasConcept');
+      $children_resources = $object->relationships->get(RELS_EXT_URI, 'hasResource');
+      $child_count = count($children_concepts) + count($children_resources);
+  
+      if ($parent_count == 1 && $child_count == 0) { // All child concepts/resource belong to other concepts
+        $is_resource = in_array('si:resourceCModel', $object->models);
+
+        $predicate = 'hasConcept';
+        if ($is_resource) {
+          $predicate = 'hasResource';
+        }
+        sidora_update_relationship(RELS_EXT_URI, $predicate, key($parents), $pid, TRUE);
         $success = $properties->setState('D');
         $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
       }
       else {
         $message = t('Failed to delete object. You cannot delete an object that is the sole parent of one or more Concepts/Resources.');
+      }   
+  
+    } catch(Exception $e) {
+      $code = $e->getCode();
+      switch($code) {
+        case '404':
+          if(!isset($description)) { // Couldn't reach the repository.
+            drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
+          }
+          drupal_not_found();
+          break;
+        case '401':
+        case '403':
+          drupal_access_denied();
+          break;
+        default:
+          drupal_set_message(t('An error occured when attempting to access the fedora repository. Please contact the site administrator.'), 'error', FALSE);
+          $message = '%type: !message in %function (line %line of %file).';
+          $backtrace = $e->getTrace();
+          $caller = $backtrace[1];
+          $variables = array(
+            '%type' => get_class($e),
+            '!message' => check_plain($e->getMessage()),
+            '%function' => $caller['function'],
+            '%file' => $caller['file'],
+            '%line' => $caller['line']
+          );
+          watchdog('islandora', $message, $variables, WATCHDOG_ERROR, NULL);
+          drupal_not_found();
+          break;
       }
+      drupal_exit();
     }
+  
   }
   else {
     $message = t('Object does not exist or is in a in-active state.');
   }
+  
   echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
-  exit();
+  drupal_exit();
+ 
 }
 
 function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hacks!
@@ -1069,26 +1115,56 @@ function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hack
 function content_model_viewer_remove_from_collection($pid, $value) {
   module_load_include('inc', 'fedora_repository', 'CollectionClass');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $query = 'select $o from <#ri> where $o <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $o
-    or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf>';
-  $collection = new CollectionClass();
-  $results = $collection->getRelatedItems($pid, $query);
-  $results = trim($results);
-  if ($results != '') {
-    $xml = simplexml_load_string($results);
-    $xml->registerXPathNamespace('ns', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
-    $parents = $xml->xpath("//ns:result/ns:o/@uri");
-    if (count($parents) < 2) {
-      echo json_encode(array('success' => FALSE, 'msg' => t('Object cannot be orphaned')));
-      exit();
+  module_load_include('inc', 'sidora', 'includes/utils');
+  $repo = tuque_wrapper_get_repository_instance();
+
+  try {
+    $description = $repo->api->a->describeRepository(); // Check for repository access
+    $child = $repo->getObject($pid); // Check for object access
+    $is_resource = in_array('si:resourceCModel', $child->models);
+
+    $predicate = 'hasConcept';
+    $recipient = $value;
+    $related = $pid;
+    if ($is_resource) {
+      $predicate = 'hasResource';
     }
+    sidora_update_relationship(RELS_EXT_URI, $predicate, $recipient, $related, TRUE);
+
+  } catch(Exception $e) {
+    $code = $e->getCode();
+    switch ($code) {
+      case '404':
+        if (!isset($description)) { // Couldn't reach the repository.
+          drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
+        }
+        drupal_not_found();
+        break;
+      case '401':
+      case '403':
+        drupal_access_denied();
+        break;
+      default:
+        drupal_set_message(t('An error occured when attempting to access the fedora repository. Please contact the site administrator.'), 'error', FALSE);
+        $message = '%type: !message in %function (line %line of %file).';
+        $backtrace = $e->getTrace();
+        $caller = $backtrace[1];
+        $variables = array(
+          '%type' => get_class($e),
+          '!message' => check_plain($e->getMessage()),
+          '%function' => $caller['function'],
+          '%file' => $caller['file'],
+          '%line' => $caller['line']
+        );
+        watchdog('islandora', $message, $variables, WATCHDOG_ERROR, NULL);
+        drupal_not_found();
+        break;
+    }
+    drupal_exit();
   }
-  $item = new Fedora_Item($pid);
-  $item->purge_relationship('rel:isMemberOf', $value);
-  $item->purge_relationship('rel:isMemberOfCollection', $value);
+
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
-  exit();
+  drupal_exit();
 }
 /**
  * Adds a datastream to the object identified by $pid.*
@@ -1419,7 +1495,7 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
             file_delete($file);
             return;
           }
-          else if (!$content_model->execIngestRules($file, $format)) {
+          elseif (!$content_model->execIngestRules($file, $format)) {
             drupal_set_message(t('Error following Content Model Rules'), 'error');
             foreach (ContentModel::$errors as $error) {
               drupal_set_message($error, 'error');
@@ -1445,6 +1521,30 @@ function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$
   if ($form_state['storage']['step'] == 2) {
     $ingest_form = new IngestObjectMetadataForm();
     $ingest_form->submit($form, $form_state);
+
+    //TODO we need to remove the default ismemberofcollection relationship and go to a new format of hasConcept or hasResource. This needs to change HACK HACK
+    $parent_pid = $form_state['values']['collection_pid'];
+    $child_pid = $form_state['values']['pid'];
+    $repo = tuque_wrapper_get_repository_instance();
+    $parent = $repo->getObject($parent_pid);
+    $child = $repo->getObject($child_pid);
+    //remove ismember if collection from child
+    $child->relationships->remove(RELS_EXT_URI, 'isMemberOfCollection', $parent_pid);
+
+    $is_imageCModel = in_array('si:imageCModel', $child->models);
+    $is_fieldbookCModel = in_array('si:fieldbookCModel', $child->models);
+    $is_datasetCModel = in_array('si:datasetCModel', $child->models);
+
+    $predicate = 'hasConcept';
+    $model = 'si:conceptCModel';
+    if ($is_imageCModel || $is_fieldbookCModel || $is_datasetCModel) {
+      $predicate = 'hasResource';
+      $model = 'si:resourceCModel';
+    }
+    $parent->relationships->add(RELS_EXT_URI, $predicate, $child_pid);
+
+    $child->relationships->add(FEDORA_MODEL_URI, 'hasModel', $model);
+
     $_SESSION['content_model_viewer_refresh_tree'] = $form_state['values']['pid']; // Yucky hack
   }
   $form_state['redirect'] = "viewer/{$form_state['values']['pid']}/overview";
