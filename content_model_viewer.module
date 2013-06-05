@@ -1066,7 +1066,7 @@ function content_model_viewer_purge_object($pid) {
           drupal_not_found();
           break;
       }
-      drupal_exit();
+      exit();
     }
   
   }
@@ -1075,7 +1075,7 @@ function content_model_viewer_purge_object($pid) {
   }
   
   echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
-  drupal_exit();
+  exit();
  
 }
 
@@ -1160,11 +1160,11 @@ function content_model_viewer_remove_from_collection($pid, $value) {
         drupal_not_found();
         break;
     }
-    drupal_exit();
+    exit();
   }
 
   echo json_encode(array('success' => TRUE, 'msg' => t('Removed Relationship')));
-  drupal_exit();
+  exit();
 }
 /**
  * Adds a datastream to the object identified by $pid.*
