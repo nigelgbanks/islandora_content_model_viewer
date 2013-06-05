@@ -21,10 +21,8 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     if(typeof(pid) == 'string' && pid.length > 0) {
       var root = this.store.getRootNode();
       var cascadeFunc = function(n) {
-        console.debug("NODES PID: " + n.get('pid'));
-        console.debug("TARGET PID: " + pid);
-        if(n.get('pid') == pid) { 
-          nodes.push(n); 
+        if(n.get('pid') == pid) {
+          nodes.push(n);
         }
         return true;
       }
