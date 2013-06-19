@@ -17,7 +17,7 @@ Ext.onReady(function (){
         form.load({
           method: 'GET',
           waitMsg: 'Loading...',
-          url: ContentModelViewer.properties.url.object.properties(pid),
+          url: ContentModelViewer.properties.url.object.properties(pid)
         });
       }
     },
@@ -42,7 +42,7 @@ Ext.onReady(function (){
         id: 'purge-object',
         handler : function () {
           Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
-        },
+        }
       }]
     }],
     items: [{

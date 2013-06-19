@@ -30,7 +30,7 @@ ContentModelViewer.setup.initExtJSFeatures = function () {
  * Set up events on global objects such as the window or document.
  */
 ContentModelViewer.setup.setUpGlobalEvents = function () {
-  if (window.hasOwnProperty('onhashchange')) {
+  if (Object.prototype.hasOwnProperty.call(window, 'onhashchange')) {
     window.onhashchange = function () {
       var token = window.location.hash.substr(1),
         tabpanel = Ext.getCmp('cmvtabpanel');
@@ -171,7 +171,7 @@ ContentModelViewer.setup.defineFunctions = function () {
         tabpanel.insert(0, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
           title: 'Concept Overview',
           itemId: 'concept-overview',
-          pid: pid,
+          pid: pid
         }));
       } else if (overview) {
         overview.setPid(pid);
@@ -211,7 +211,7 @@ ContentModelViewer.setup.defineFunctions = function () {
       // Create the panel and insert it in the after the Concept Overview if it doesn't exist.
       if (!resources && typeof ContentModelViewer.widgets.CollectionPanel !== 'undefined') {
         Ext.getCmp('cmvtabpanel').insert(1, Ext.create('ContentModelViewer.widgets.CollectionPanel', {
-          pid: pid,
+          pid: pid
         }));
       } else if (resources) {
         resources.setPid(pid); // The Collection panel should show the resources of the given concept.
@@ -227,7 +227,7 @@ ContentModelViewer.setup.defineFunctions = function () {
         Ext.getCmp('cmvtabpanel').add(Ext.create('ContentModelViewer.widgets.ViewerPanel', {
           pid: pid,
           dsid: dsid,
-          viewFunction: viewFunction,
+          viewFunction: viewFunction
         }));
       } else if (panel) {
         panel.setPid(pid);
@@ -238,7 +238,7 @@ ContentModelViewer.setup.defineFunctions = function () {
       // Create the panel and insert it in the last position if it doesn't exist.
       if (!panel && typeof ContentModelViewer.widgets.ManagePanel !== 'undefined') {
         Ext.getCmp('cmvtabpanel').add(Ext.create('ContentModelViewer.widgets.ManagePanel', {
-          pid: pid,
+          pid: pid
         }));
       } else if (panel) {
         panel.setPid(pid);
@@ -443,35 +443,35 @@ ContentModelViewer.setup.defineModels = function () {
     extend: 'Ext.data.Model',
     fields: [{
       name: 'pid',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'link',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'label',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'description',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'owner',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'created',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'modified',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'tn',
-      type: 'string',
+      type: 'string'
     }, {
       name: 'isCollection',
-      type: 'boolean',
+      type: 'boolean'
     }, {
       name: 'originalMetadata',
       type: 'boolean',
-      defaultValue: false,
+      defaultValue: false
     }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
@@ -588,13 +588,13 @@ ContentModelViewer.setup.createStores = function () {
     model: models.treemembers,
     sorters: [{
       property: 'text',
-      direction: 'ASC',
+      direction: 'ASC'
     }],
     root: {
       text: rootowner,
       iconCls: icon,
       expanded: true,
-      pid: properties.root,
+      pid: properties.root
     }
   });
 };

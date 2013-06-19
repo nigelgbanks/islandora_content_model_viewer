@@ -31,10 +31,10 @@ Ext.onReady(function () {
           if (token && this.isVisible(token)) {
             this.setActiveTab(token);
           }
-          setup.navigateToObject();
+          ContentModelViewer.setup.navigateToObject();
         }
       }
     }]
   });
-  setup.setUpGlobalEvents();
+  ContentModelViewer.setup.setUpGlobalEvents();
 });

@@ -159,7 +159,7 @@ Ext.onReady(function () {
         }, {
           xtype: 'textfield',
           hideLabel: true,
-          width: 200,
+          width: 200
         }, {
           xtype: 'button',
           text: 'Go',

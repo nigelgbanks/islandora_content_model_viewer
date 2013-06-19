@@ -26,7 +26,7 @@ Ext.onReady(function () {
           }
         },
         listeners: {
-          load: config.onLoad || function () {},
+          load: config.onLoad || function () {}
         }
       });
       datastreams = Ext.create('Ext.view.View', {

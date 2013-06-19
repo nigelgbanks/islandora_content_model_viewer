@@ -8,7 +8,7 @@ Ext.define('Ext.multisort.SortButton', {
   alias : 'widget.sortbutton',
   config: {
     direction: "ASC",
-    dataIndex: undefined,
+    dataIndex: undefined
   },
   constructor: function (config) {
     this.addEvents(
@@ -19,9 +19,7 @@ Ext.define('Ext.multisort.SortButton', {
        */
       'changeDirection'
     );
-
     this.initConfig(config);
-
     this.callParent(arguments);
   },
   handler: function () {
@@ -35,7 +33,6 @@ Ext.define('Ext.multisort.SortButton', {
     this.setIconCls('direction-' + direction.toLowerCase());
     this.fireEvent('changeDirection', direction);
   },
-
   /**
    * Toggles between ASC and DESC directions
    */

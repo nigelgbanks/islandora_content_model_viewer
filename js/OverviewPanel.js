@@ -3,7 +3,7 @@ Ext.onReady(function () {
     extend: 'Ext.panel.Panel',
     alias: 'widget.overviewpanel',
     config: {
-      pid: 'required',
+      pid: 'required'
     },
     constructor: function (config) {
       var url, files;

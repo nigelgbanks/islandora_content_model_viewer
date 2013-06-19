@@ -27,7 +27,7 @@ Ext.onReady(function () {
     itemId: 'manage',
     title: 'Manage',
     layout: {
-      type: 'border',
+      type: 'border'
     }
   });
 });

@@ -33,12 +33,12 @@ function loadFlexPlayer(pid, dsid) {
     quality: "high",
     bgcolor: "#ffffff",
     allowscriptaccess: "sameDomain",
-    allowfullscreen: "true",
+    allowfullscreen: "true"
   };
   attributes = {
     id: "FlexPaperViewer",
     name: "FlexPaperViewer",
-    wmode: "transparent",
+    wmode: "transparent"
   };
   swfobject.embedSWF(
     base_url + "/sites/all/libraries/flexpaper/FlexPaperViewer.swf",

@@ -66,7 +66,7 @@ Ext.onReady(function () {
       dataIndex: 'label',
       field: {
         xtype: 'textfield',
-        allowBlank: false,
+        allowBlank: false
       },
       flex: 1
     }, {

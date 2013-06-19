@@ -61,7 +61,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
         this.loadPid(pid);
       } else {
         this.store.load({
-          url: ContentModelViewer.properties.url.object.treemembers(pid),
+          url: ContentModelViewer.properties.url.object.treemembers(pid)
         });
       }
     }
