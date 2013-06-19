@@ -122,40 +122,34 @@ class Collection {
   }
 
   public function getTreeMembers() {
-
-  $query = 'select $object $title $model $created $parent_model
-    count(select $pid from <#ri> where ($object <fedora-model:hasModel> $sub_model
-     and $sub_model <fedora-model:hasModel> $sub_parent_model
-     and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and $pid <fedora-model:hasModel> $child_model
-     and ($object <fedora-rels-ext:hasConcept> $pid))
-     minus $child_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-    )
-    from <#ri> where ($object <info:fedora/fedora-system:def/model#label> $title
-     and $object <fedora-model:hasModel> $model
-     and $model <fedora-model:hasModel> $parent_model
-     and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-     and $object <fedora-model:createdDate> $created
-     and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-     and (<info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object))
-     minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-     minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-     minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-     order by $title';
-
+    $child_concepts = 'count(select $concept from <#ri> where
+      $object <fedora-rels-ext:hasConcept> $concept and
+      $concept <fedora-model:state> <fedora-model:Active>)';
+    $child_resources = 'count(select $resource from <#ri> where
+      $object <fedora-rels-ext:hasResource> $resource and
+      $resource <fedora-model:state> <fedora-model:Active>)';
+    $query = 'select $object $title $model $created ' . $child_concepts . ' ' . $child_resources . ' from <#ri> where
+      <info:fedora/' . $this->pid . '> <fedora-rels-ext:hasConcept> $object and
+      $object <fedora-model:state> <fedora-model:Active> and
+      $object <fedora-model:label> $title and
+      $object <fedora-model:createdDate> $created and
+      $object <fedora-model:hasModel> $model
+      minus $model <mulgara:is> <info:fedora/si:conceptCModel>
+      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
     $results = $this->query($query);
     $results = $this->populate($results);
     return $results;
   }
 
+  // Counts resources.
   public function getChildCount($pid) {
-    $query = 'select $object $title count(select $pid from <#ri> where $object <fedora-model:hasModel> $sub_model and $sub_model <fedora-model:hasModel> $sub_parent_model
-              and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel> and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-              and $pid <fedora-model:state> <info:fedora/fedora-system:def/model#Active> and
-              ($object <fedora-rels-ext:hasConcept> $pid))
-              from <#ri> where ($object <mulgara:is>  <info:fedora/' . $pid . '> and $object <info:fedora/fedora-system:def/model#label> $title)';
+    $count = 'count(select $pid from <#ri> where
+      $pid <fedora-model:state> <fedora-model:Active> and
+      $object <fedora-rels-ext:hasResource> $pid or
+      $object <fedora-rels-ext:hasConcept> $pid)';
+    $query = 'select $object $title ' . $count . ' from <#ri> where
+      $object <mulgara:is>  <info:fedora/' . $pid . '> and
+      $object <fedora-model:label> $title';
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
     $collection = new CollectionClass();
     $results = $collection->getRelatedObjects($pid, 1000000, NULL, $query);
@@ -196,23 +190,22 @@ class Collection {
    * @return array
    */
   private function findParent($pid) {
-    $query = 'select $object $title $model $created from <#ri>
-                             where ($object <info:fedora/fedora-system:def/model#label> $title
-                             and $object <fedora-model:hasModel> $model
-                             and $object <fedora-model:createdDate> $created
-                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                             and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
-                             or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf> $object))
-                             minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-                             minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                             order by $title';
+    $query = 'select $object $title $model $created from <#ri> where
+      $object <fedora-rels-ext:hasConcept> <info:fedora/' . $pid . '> and
+      $object <fedora-model:state> <fedora-model:Active> and
+      $object <fedora-model:label> $title and
+      $object <fedora-model:createdDate> $created and
+      $object <fedora-model:hasModel> $model
+      minus $model <mulgara:is> <info:fedora/si:conceptCModel>
+      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      order by $title';
     return $this->query($query);
   }
 
   private function findParents($pid) {
-    $query = 'select $subject $object from <#ri>
-                            where walk(<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
-                            and $subject <fedora-rels-ext:isMemberOfCollection> $object)';
+    $query = 'select $subject $object from <#ri> where walk(
+      $object <fedora-rels-ext:hasConcept> <info:fedora/' . $pid . '> and
+      $subject <fedora-rels-ext:hasConcept> $object)';
     return $this->query($query);
   }
 
@@ -222,15 +215,15 @@ class Collection {
    * @return array
    */
   private function findMembers() {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
-                        where ($object <info:fedora/fedora-system:def/model#label> $title
-                        and $object <fedora-model:hasModel> $model
-                        and $model <fedora-model:hasModel> $parent_model
-                        and $parent_model <mulgara:is> <info:fedora/islandora:resourceCModel>
-                        and $object <fedora-model:createdDate> $created
-                        and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                        and (<info:fedora/' . $this->pid . '><fedora-rels-ext:hasResource> $object))
-                        order by $title';
+    $query = 'select $object $title $model  from <#ri> where
+      <info:fedora/' . $this->pid . '> <fedora-rels-ext:hasResource> $object and
+      $object <fedora-model:state> <fedora-model:Active> and
+      $object <fedora-model:label> $title and
+      $object <fedora-model:createdDate> $created and
+      $object <fedora-model:hasModel> $model
+      minus $model <mulgara:is> <info:fedora/si:resourceCModel>
+      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      order by $title';
     return $this->query($query, TRUE);
   }
 
@@ -289,10 +282,12 @@ class Collection {
     $pid = substr($pid, self::MODEL_PREFIX_LENGTH);
     $label = $this->getQueryResultValue('sparql:title', $result, $path);
     $created = $this->getQueryResultValue('sparql:created', $result, $path);
-    $relatedCount = $this->getQueryResultValue('sparql:k0', $result, $path);
+    $concept_count = $this->getQueryResultValue('sparql:k0', $result, $path);
+    $resource_count = $this->getQueryResultValue('sparql:k1', $result, $path);
+    $count = $concept_count + $resource_count;
     $model = $this->getQueryResultValue('sparql:model/@uri', $result, $path);
     $model = substr($model, self::MODEL_PREFIX_LENGTH);
-    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model);
+    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $concept_count, 'model' => $model, 'count' => $count);
   }
 
   /**

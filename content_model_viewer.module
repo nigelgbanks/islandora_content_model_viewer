@@ -533,7 +533,6 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   $user_data = unserialize($user->data);
   $user_pid = $user_data['islandora_user_pid'];
 
-
   if (in_array('administrator', $user->roles)) {
     $root = variable_get('fedora_repository_pid', 'islandora:root');
     $pid = $user_pid;
@@ -566,6 +565,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
   else {
     $variables['rootowner'] = $user->name;
   }
+
   $variables['root'] = $root;
   $variables['base_url'] = $base_url;
   $variables['dsid'] = 'SWF'; // Default viewer.
@@ -1008,20 +1008,22 @@ function content_model_viewer_purge_object($pid) {
   $properties = new ObjectProperties($pid);
   $state = $properties->state;
   $success = FALSE;
-  
+
   if (array_search($state, $active_states) !== FALSE) {
     $parents = sidora_get_parents($pid);
     $parent_count = count($parents);
-  
+
     $repo = tuque_wrapper_get_repository_instance();
-  
+
+
+    // @todo Remove THIS SHIT!!!!!!!! Replace with tuque stuff.o
     try {
       $description = $repo->api->a->describeRepository();
-      $object = $repo->getObject($pid); 
+      $object = $repo->getObject($pid);
       $children_concepts = $object->relationships->get(RELS_EXT_URI, 'hasConcept');
       $children_resources = $object->relationships->get(RELS_EXT_URI, 'hasResource');
       $child_count = count($children_concepts) + count($children_resources);
-  
+
       if ($parent_count == 1 && $child_count == 0) { // All child concepts/resource belong to other concepts
         $is_resource = in_array('si:resourceCModel', $object->models);
 
@@ -1035,13 +1037,13 @@ function content_model_viewer_purge_object($pid) {
       }
       else {
         $message = t('Failed to delete object. You cannot delete an object that is the sole parent of one or more Concepts/Resources.');
-      }   
-  
+      }
+
     } catch(Exception $e) {
       $code = $e->getCode();
-      switch($code) {
+      switch ($code) {
         case '404':
-          if(!isset($description)) { // Couldn't reach the repository.
+          if (!isset($description)) { // Couldn't reach the repository.
             drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'error', FALSE);
           }
           drupal_not_found();
@@ -1068,15 +1070,15 @@ function content_model_viewer_purge_object($pid) {
       }
       exit();
     }
-  
+
   }
   else {
     $message = t('Object does not exist or is in a in-active state.');
   }
-  
+
   echo json_encode(array('success' => $success, 'msg' => $message, 'pid' => $pid));
   exit();
- 
+
 }
 
 function content_model_viewer_add_object($pid, $type = 'concept') { // Ugly hacks!
