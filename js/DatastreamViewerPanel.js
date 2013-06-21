@@ -1,9 +1,9 @@
-Ext.onReady(function(){
+Ext.onReady(function () {
   Ext.define('ContentModelViewer.widgets.DatastreamViewerPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.datastreamviewerpanel',
     autoScroll: true,
-    constructor: function(config) {
+    constructor: function (config) {
       this.callParent(arguments);
       this.load(config.pid, config.dsid, config.viewFunction);
     },
@@ -15,22 +15,21 @@ Ext.onReady(function(){
       successful: 'alert',
       loadMask: true
     },
-    load: function(pid, dsid, viewFunction) {
-      var properties = ContentModelViewer.properties;
-      var url = properties.url;
-      var loader = this.getLoader();
+    load: function (pid, dsid, viewFunction) {
+      var properties = ContentModelViewer.properties,
+        loader = this.getLoader();
       loader.load({
-        url: url.datastream.view(pid, dsid),
-        success: function() {
-          if(viewFunction) {
+        url: properties.url.datastream.view(pid, dsid),
+        success: function () {
+          if (viewFunction) {
             eval(viewFunction)(pid, dsid);
           }
         }
       });
     },
-    view: function(pid, dsid, viewFunction) {
-      this.load(pid, dsid, viewFunction);
+    view: function (pid, dsid, viewFunction) {
       var viewerPanel = this.findParentByType('viewerpanel');
+      this.load(pid, dsid, viewFunction);
       Ext.getCmp('cmvtabpanel').setActiveTab(viewerPanel);
     }
   });
