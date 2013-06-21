@@ -1,22 +1,21 @@
-Ext.onReady(function(){
+Ext.onReady(function () {
   Ext.define('ContentModelViewer.widgets.FilesPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.filespanel',
     config: {
       pid: 'required'
     },
-    constructor: function(config) {
+    constructor: function (config) {
+      var store, datastreams, toolbar, pager;
       this.callParent(arguments);
       this.collapsed = true;
-      var properties = ContentModelViewer.properties;
-      var url = properties.url;
-      var store = this.store = Ext.create('Ext.data.Store', {
+      store = this.store = Ext.create('Ext.data.Store', {
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
         pageSize: 4,
         proxy: {
           type: 'rest',
-          url : url.object.datastreams(config.pid),
+          url : ContentModelViewer.properties.url.object.datastreams(config.pid),
           extraParams: {
             filter: true
           },
@@ -27,10 +26,10 @@ Ext.onReady(function(){
           }
         },
         listeners: {
-          load: (config.onLoad) ? config.onLoad : function() {}
+          load: config.onLoad || function () {}
         }
       });
-      var datastreams = Ext.create('Ext.view.View', {
+      datastreams = Ext.create('Ext.view.View', {
         itemId: 'datastreams',
         itemSelector: 'div.file-item',
         emptyText: 'No Files Available',
@@ -48,26 +47,33 @@ Ext.onReady(function(){
           {
             compiled: true,
             disableFormats: true,
-            showLabel: function(label) {
-              return jQuery.trim(label) != '';
+            showLabel: function (label) {
+              return jQuery.trim(label) !== '';
             }
-          }),
+          }
+        ),
         store: store,
         listeners: {
-          selectionchange: function(view, selections, options) {
-            var filesPanel = this.findParentByType('filespanel');
-            var toolbar = filesPanel.getComponent('toolbar');
-            var button, record = selections[0];
-            if(record) {
-              button = toolbar.getComponent('view');
-              record.get('view') ? button.enable() : button.disable();
-              button = toolbar.getComponent('download');
-              record.get('download') ? button.enable() : button.disable();
+          selectionchange: function (view, selections, options) {
+            var toolbar, record;
+            toolbar = this.findParentByType('filespanel').getComponent('toolbar');
+            record = selections[0];
+            if (record) {
+              if (record.get('view')) {
+                toolbar.getComponent('view').enable();
+              } else {
+                toolbar.getComponent('view').disable();
+              }
+              if (record.get('download')) {
+                toolbar.getComponent('download').enable();
+              } else {
+                toolbar.getComponent('download').disable();
+              }
             }
-          } 
-        }    
+          }
+        }
       });
-      var toolbar = Ext.create('Ext.toolbar.Toolbar', {
+      toolbar = Ext.create('Ext.toolbar.Toolbar', {
         dock: 'top',
         itemId: 'toolbar',
         items: [{
@@ -77,11 +83,13 @@ Ext.onReady(function(){
           cls: 'x-btn-text-icon',
           iconCls: 'view-datastream-icon',
           disabled: true,
-          handler : function() {
-            var filesPanel = this.findParentByType('filespanel');
-            var record = filesPanel.getSelected();
-            if(record) {
-              var dsid = record.get('view'), func = record.get('view_function');
+          handler : function () {
+            var filesPanel, record, dsid, func;
+            filesPanel = this.findParentByType('filespanel');
+            record = filesPanel.getSelected();
+            if (record) {
+              dsid = record.get('view');
+              func = record.get('view_function');
               Ext.getCmp('datastream-viewer').view(filesPanel.pid, dsid, func);
             }
           }
@@ -92,16 +100,17 @@ Ext.onReady(function(){
           iconCls: 'download-datastream-icon',
           itemId: 'download',
           disabled: true,
-          handler : function() {
-            var filesPanel = this.findParentByType('filespanel');
-            var record = filesPanel.getSelected();
-            if(record) {
+          handler : function () {
+            var filesPanel, record;
+            filesPanel = this.findParentByType('filespanel');
+            record = filesPanel.getSelected();
+            if (record) {
               ContentModelViewer.functions.downloadDatastream(filesPanel.pid, record.get('dsid'));
             }
           }
         }]
       });
-      var pager = Ext.create('Ext.toolbar.Paging', {
+      pager = Ext.create('Ext.toolbar.Paging', {
         dock: 'bottom',
         itemId: 'pager',
         xtype: 'pagingtoolbar',
@@ -111,13 +120,12 @@ Ext.onReady(function(){
       this.addDocked(toolbar);
       this.addDocked(pager);
     },
-    setPid: function(pid) {
-      var properties = ContentModelViewer.properties;
-      var url = properties.url;
+    setPird: function (pid) {
+      var pager = this.getComponent('pager');
       this.pid = pid;
       this.store.setProxy({
         type: 'rest',
-        url : url.object.datastreams(pid),
+        url : ContentModelViewer.properties.url.object.datastreams(pid),
         extraParams: {
           filter: true
         },
@@ -127,14 +135,13 @@ Ext.onReady(function(){
           totalProperty: 'total'
         }
       });
-      var pager = this.getComponent('pager');
       pager.doRefresh();
-    //this.store.load();
     },
-    getSelected: function() {
-      var datastreams = this.getComponent('datastreams');
-      var selectionModel = datastreams.getSelectionModel();
-      if(selectionModel.hasSelection()) {
+    getSelected: function () {
+      var datastreams, selectionModel;
+      datastreams = this.getComponent('datastreams');
+      selectionModel = datastreams.getSelectionModel();
+      if (selectionModel.hasSelection()) {
         return selectionModel.selected.first();
       }
       return null;
