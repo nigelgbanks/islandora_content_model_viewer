@@ -557,7 +557,7 @@ function template_preprocess_content_model_viewer_iframe(array &$variables) {
        and $object <mulgara:is> <info:fedora/' . $user_pid . '>)';
     $collectionClass = new CollectionClass();
     $query_results = $collectionClass->getRelatedItems(NULL, $itql_query);
-    $xml_set = sirsmplexml_load_string($query_results);
+    $xml_set = simplexml_load_string($query_results);
     $result = $xml_set->results->result[0];
     $variables['rootowner'] = $result->title;
     $variables['si_user'] = $user_pid;
@@ -1015,6 +1015,8 @@ function content_model_viewer_purge_object($pid) {
 
     $repo = tuque_wrapper_get_repository_instance();
 
+
+    // @todo Remove THIS SHIT!!!!!!!! Replace with tuque stuff.o
     try {
       $description = $repo->api->a->describeRepository();
       $object = $repo->getObject($pid);
