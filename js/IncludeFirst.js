@@ -517,7 +517,7 @@ ContentModelViewer.setup.defineModels = function () {
       name: 'dsid',
       type: 'string'
     }, {
-      name: 'label',
+      name: 'olabel',
       type: 'string'
     }, {
       name: 'state',

@@ -102,10 +102,9 @@ class Tree {
    */
   private function createNode(array $member) {
     $node = array();
-    $has_children = $member['relatedCount'] > 0;
-    $node['leaf'] = !$has_children;
+    $node['leaf'] = $member['relatedCount'] == 0;
     $node['text'] = (empty($member['label'])) ? $member['pid'] : $member['label'];
-    $node['text'] .= $has_children ? ' (' . $member['relatedCount'] . ')' : '';
+    $node['text'] .= $member['count'] ? ' (' . $member['count'] . ')' : '';
     $node['link'] = $member['link'];
     $node['id'] = $member['pid'] . '|||' . rand(10000, 99999);
     $node['pid'] = $member['pid'];
