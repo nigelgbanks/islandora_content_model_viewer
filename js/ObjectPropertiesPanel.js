@@ -1,4 +1,4 @@
-Ext.onReady(function(){
+Ext.onReady(function (){
   Ext.define('ContentModelViewer.widgets.ObjectPropertiesPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.objectpropertiespanel',
@@ -10,10 +10,10 @@ Ext.onReady(function(){
     layout: {
       type: 'border'
     },
-    setPid: function(pid) {
-      this.pid = pid;
+    setPid: function (pid) {
       var form = this.getComponent('form');
-      if(form.rendered) {
+      this.pid = pid;
+      if (form.rendered) {
         form.load({
           method: 'GET',
           waitMsg: 'Loading...',
@@ -31,7 +31,7 @@ Ext.onReady(function(){
         cls: 'x-btn-text-icon',
         iconCls: 'edit-datastream-icon',
         id: 'object-properties-edit-xacml',
-        handler: function() {
+        handler: function () {
           Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
         }
       }, {
@@ -40,30 +40,8 @@ Ext.onReady(function(){
         cls: 'x-btn-text-icon',
         iconCls: 'remove-datastream-icon',
         id: 'purge-object',
-	      handler : function() {
+        handler : function () {
           Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
-          /*Ext.Msg.show({
-            title:'Purge Object?',
-            msg: 'Are you sure you want to purge this object? This action cannot be undone.',
-            buttons: Ext.Msg.YESNO,
-            fn: function(choice) {
-            if(choice == 'yes') {
-            var url = ContentModelViewer.properties.url.object.purge;
-            Ext.Ajax.request({
-            url: url,
-            method: 'POST',
-            success: function(response){
-            var data;
-            data = Ext.decode(response.responseText);
-            Ext.Msg.alert('Status', data.msg);
-            if (data.success === true) {
-            window.location.href = Drupal.settings.basePath + 'fedora/repository';                  }
-            }
-            });
-            }
-            },
-            icon: Ext.window.MessageBox.QUESTION
-            });*/
         }
       }]
     }],
@@ -109,20 +87,21 @@ Ext.onReady(function(){
       buttons: [{
         text: 'Save Changes',
         formBind: true, // Only enabled once the form is valid
-        handler: function(button) {
-          var url = ContentModelViewer.properties.url;
-          var pid = this.findParentByType('objectpropertiespanel').pid;
+        handler: function (button) {
+          var url, pid;
+          url = ContentModelViewer.properties.url;
+          pid = this.findParentByType('objectpropertiespanel').pid;
           button.up('form').getForm().submit({
             url: url.object.properties(pid),
             waitMsg: 'Saving Data...',
-            success: function(form, action) {
+            success: function (form, action) {
             // @todo revert the fields if submit fails.
             }
           });
         }
       }],
       listeners: {
-        afterrender: function(form) {
+        afterrender: function (form) {
           var pid = this.findParentByType('objectpropertiespanel').pid;
           form.load({
             method: 'GET',

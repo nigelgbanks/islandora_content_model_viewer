@@ -7,7 +7,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   viewConfig : {selectedItemCls : "even"},
   region: 'west',
   folderSort: false,
-  store:'treemembers',
+  store: 'treemembers',
   autoLoad: false,
   root: 'data',
   rootVisible: true,
@@ -16,74 +16,76 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
   title: 'Projects',
   width: 250,
   useArrows: true,
-  getNodesByPid: function(pid) {
-    var nodes = [];
-    if(typeof(pid) == 'string' && pid.length > 0) {
-      var root = this.store.getRootNode();
-      var cascadeFunc = function(n) {
-        if(n.get('pid') == pid) {
+  getNodesByPid: function (pid) {
+    var nodes = [],
+      root = this.store.getRootNode(),
+      cascadeFunc = function (n) {
+        if (n.get('pid') === pid) {
           nodes.push(n);
         }
         return true;
-      }
+      };
+    if (typeof (pid) === 'string' && pid.length > 0) {
       root.cascadeBy(cascadeFunc);
     }
     return nodes;
   },
-  getParentNodesByPid: function(pid) {
-    var parents = [];
-    var nodes = this.getNodesByPid(pid);
-    for(var i = 0; i < nodes.length; i++) {
-      var parent = nodes[i].parentNode;
-      if(parent != null) {
+  getParentNodesByPid: function (pid) {
+    var parent = null,
+      parents = [],
+      nodes = this.getNodesByPid(pid),
+      i = 0;
+    for (i = 0; i < nodes.length; i += 1) {
+      parent = nodes[i].parentNode;
+      if (parent !== null) {
         parents.push(parent);
       }
     }
     return parents;
   },
-  loadNodes: function(nodes) {
-    for(var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
+  loadNodes: function (nodes) {
+    var node, i;
+    for (i = 0; i < nodes.length; i += 1) {
+      node = nodes[i];
       this.refreshNodes(node.get('pid'));
     }
   },
-  loadPid: function(pid) {
-    if(typeof(pid) == 'string' && pid.length > 0) {
+  loadPid: function (pid) {
+    if (typeof (pid) === 'string' && pid.length > 0) {
       this.store.load({ url: ContentModelViewer.properties.url.object.treemembers(pid) });
     }
   },
-  refreshChildren: function(pid) {
-    if(pid != undefined) {
-      if(pid == ContentModelViewer.properties.root) {
+  refreshChildren: function (pid) {
+    if (pid !== undefined) {
+      if (pid === ContentModelViewer.properties.root) {
         this.loadPid(pid);
-      }
-      else {
+      } else {
         this.store.load({
-          url: ContentModelViewer.properties.url.object.treemembers(pid),
+          url: ContentModelViewer.properties.url.object.treemembers(pid)
         });
       }
     }
   },
-  refreshParents: function(pid) {
-    if(pid != undefined) {
+  refreshParents: function (pid) {
+    if (pid !== undefined) {
       this.loadNodes(this.getParentNodesByPid(pid));
     }
   },
-  refreshNodes: function(pid) {
+  refreshNodes: function (pid) {
     var nodes = this.getNodesByPid(pid);
     if (nodes.length > 0) {
       Ext.Ajax.request({
         url: ContentModelViewer.properties.url.object.treemember(pid),
-        success: function(response){
-          var responseData = JSON.parse(response.responseText);
-          var children = responseData.data;
-          for(var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
+        success: function (response) {
+          var responseData, children, node, i;
+          responseData = JSON.parse(response.responseText);
+          children = responseData.data;
+          for (i = 0; i < nodes.length; i += 1) {
+            node = nodes[i];
             node.removeAll();
-            if (children != null) {
-            node.appendChild(children);
+            if (children !== null) {
+              node.appendChild(children);
             }
-            
             node.set('text', responseData.parents.label);
             node.set('leaf', false); // May have added a child.
             node.commit();
@@ -93,24 +95,26 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     }
   },
 
-  removeChildFromParent: function(object_pid, parent_pid) {
-    var parents = this.getNodesByPid(parent_pid);
-    for(var i = 0; i < parents.length; i++) {
-      var parent = parents[i], child = null;
-      while(child = parent.findChild('pid', object_pid)) {
+  removeChildFromParent: function (object_pid, parent_pid) {
+    var parents, parent, child, i;
+    parents = this.getNodesByPid(parent_pid);
+    for (i = 0; i < parents.length; i += 1) {
+      parent = parents[i];
+      child = parent.findChild('pid', object_pid);
+      while (child !== null) {
         parent.removeChild(child, true);
+        child = parent.findChild('pid', object_pid);
       }
     }
   },
   listeners: {
     itemclick: {
-      fn: function(view, record, item, index, event) {
+      fn: function (view, record, item, index, event) {
         var pid = record.get('pid');
-        if (record.data.id == 'root') {
+        if (record.data.id === 'root') {
           if (ContentModelViewer.properties.siUser) {
             pid = ContentModelViewer.properties.siUser;
-          }
-          else {
+          } else {
             pid = 'si:root';
           }
         }
