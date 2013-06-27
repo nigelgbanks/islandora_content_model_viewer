@@ -211,10 +211,12 @@ function content_model_viewer_theme() {
     ),
     'content_model_viewer_settings' => array(
       'template' => 'templates/Settings',
+      'file' => 'content_model_viewer.admin.inc',
     ),
     'content_model_viewer_custom_settings' => array(
       'arguments' => array('pid' => NULL),
       'template' => 'templates/CustomSettings',
+      'file' => 'content_model_viewer.admin.inc',
     ),
     'default_content_model_viewer' => array(
       'arguments' => array('pid' => NULL),
