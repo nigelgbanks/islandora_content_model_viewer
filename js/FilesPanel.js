@@ -120,7 +120,7 @@ Ext.onReady(function () {
       this.addDocked(toolbar);
       this.addDocked(pager);
     },
-    setPird: function (pid) {
+    setPid: function (pid) {
       var pager = this.getComponent('pager');
       this.pid = pid;
       this.store.setProxy({

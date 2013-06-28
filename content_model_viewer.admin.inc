@@ -3,10 +3,10 @@
 /**
  * @file
  *
- * Defines a collection of functions and forms that appear in the admin section of the site. They allow the user 
+ * Defines a collection of functions and forms that appear in the admin section of the site. They allow the user
  * to provided settings for this module.
  */
-function template_preprocess_content_model_viewer_custom_settings(array &$variables) {
+function content_model_viewer_preprocess_content_model_viewer_custom_settings(array &$variables) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
@@ -25,13 +25,13 @@ function template_preprocess_content_model_viewer_custom_settings(array &$variab
 
 /**
  * Provides a form that allows the user to add/remove Custom Settings for this module, on a per Content Model basis.
- * 
- * List all Content Model's that have defined custom settings. 
- * 
+ *
+ * List all Content Model's that have defined custom settings.
+ *
  * @param array $form_state
  *   The Drupal Form State.
- * 
- * @return array 
+ *
+ * @return array
  *   A Drupal Form.
  */
 function content_model_viewer_custom_settings_form(array &$form_state) {
@@ -89,12 +89,12 @@ function content_model_viewer_custom_settings_form(array &$form_state) {
 
 /**
  * Autocomplete the Content Model name.
- * 
+ *
  * Used by the 'content_model_viewer_custom_settings_form'.
- * 
+ *
  * @param string $string
  *   The users input.
- * 
+ *
  * @return string
  *   A json encoded string containing all the options the user can select.
  */
@@ -112,9 +112,9 @@ function content_model_viewer_autocomplete_models($string) {
 
 /**
  * Validates the add custom setting form.
- * 
+ *
  * Called from the 'content_model_viewer_custom_settings_form', when the Customize button is pressed.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
  * @param array $form_state
@@ -136,10 +136,10 @@ function content_model_viewer_add_setting_validate(array $form, array &$form_sta
 
 /**
  * Submits the add custom setting form.
- * 
+ *
  * Called from the 'content_model_viewer_custom_settings_form', when the Customize button is pressed.
  * Redirects the user to the edit page for the new custom setting form.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
  * @param array $form_state
@@ -164,12 +164,12 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
 
 /**
  * Deletes the settings associated with a given model.
- * 
+ *
  * Called from the 'content_model_viewer_custom_settings_form', when a Delete button is pressed.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_delete_setting(array $form, array &$form_state) {
@@ -181,12 +181,12 @@ function content_model_viewer_delete_setting(array $form, array &$form_state) {
 
 /**
  * Gets the default datastream rules form. Responsible for setting the default View/Download behavior of datastreams.
- * 
+ *
  * @param array $form_state
  *   The Drupal Form State.
  * @param int $model_id
  *   The settings ID.
- * 
+ *
  * @return array
  *   The Drupal Form.
  */
@@ -200,7 +200,7 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
       '#title' => t('Default Datastream Display Rules (View/Download)'),
       '#description' => t('<p>Datastream rules only apply to datastreams shown in the Overview/Viewer tab panels.
         The <b>View</b> and <b>Download</b> properties specifiy what actions will be be avalible to the end user.
-        If both <b>View</b> and <b>Download</b> are <b>Prohibited</b> then the selected datastreams won\'t appear 
+        If both <b>View</b> and <b>Download</b> are <b>Prohibited</b> then the selected datastreams won\'t appear
         in the files section of the Overview/Viewer tab panels.</p>'),
       'view' => array(
         '#type' => 'select',
@@ -233,10 +233,10 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
 
 /**
  * Sets the default view/download datastream properties for this viewer.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_datastream_default_rules_form_submit(array $form, array &$form_state) {
@@ -257,15 +257,15 @@ function content_model_viewer_datastream_default_rules_form_submit(array $form, 
 
 /**
  * Gets the Datastream rules form.
- * 
+ *
  * Lists all the existing rules, and provides several fields for adding additional rules.
- * 
+ *
  * @param array $form_state
  *   The Drupal Form State.
  * @param int $model_id
  *   The Model associated with the datastream rule.
  *
- * @return array 
+ * @return array
  *   A Drupal Form.
  */
 function content_model_viewer_datastream_mimetype_rules_form($form_state, $model_id = 1) {
@@ -324,8 +324,8 @@ function content_model_viewer_datastream_mimetype_rules_form($form_state, $model
       '#title' => t('Datastream Display Rules (MIME Type)'),
       '#description' => t('<p>If a given datastream has the same MIME type as defined by one of these rules the <b>View</b> and <b>Download</b> properties defined here will take precedent over the default properties.</p>'),
       /**
-       * A bit of a hack, I want the default action here to be add not delete, 
-       * so I've mirrored the add button and placed it at the begining of the form. 
+       * A bit of a hack, I want the default action here to be add not delete,
+       * so I've mirrored the add button and placed it at the begining of the form.
        * Making it hidden, so it will be the default action.
        */
       'add' => array(
@@ -343,15 +343,15 @@ function content_model_viewer_datastream_mimetype_rules_form($form_state, $model
 
 /**
  * Gets the Datastream rules form.
- * 
+ *
  * Lists all the existing rules, and provides several fields for adding additional rules.
- * 
+ *
  * @param array $form_state
  *   The Drupal Form State.
  * @param int $model_id
  *   The Model associated with the datastream rule.
  *
- * @return array 
+ * @return array
  *   A Drupal Form.
  */
 function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id = 1) {
@@ -416,8 +416,8 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
       '#title' => t('Datastream Display Rules (Datastream ID)'),
       '#description' => t('<p>If a given datastream\'s ID matches one of the rules below the <b>View</b> and <b>Download</b> properties defined here will take precedent over all other rules.</p>'),
       /**
-       * A bit of a hack, I want the default action here to be add not delete, 
-       * so I've mirrored the add button and placed it at the begining of the form. 
+       * A bit of a hack, I want the default action here to be add not delete,
+       * so I've mirrored the add button and placed it at the begining of the form.
        * Making it hidden, so it will be the default action.
        */
       'add' => array(
@@ -434,15 +434,15 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
 }
 
 /**
- * 
  *
- * 
+ *
+ *
  * @param array $form_state
  *   The Drupal Form State.
  * @param int $model_id
  *   The Model associated with the datastream rule.
  *
- * @return array 
+ * @return array
  *   A Drupal Form.
  */
 function content_model_viewer_datastream_rels_view_derived_form($form_state, $model_id = 1) {
@@ -511,8 +511,8 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
       '#title' => t('Derived Datastream Display Rules (RELS-INT)'),
       '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules queries the <b>RELS-INT</b> datastream for this relationship information. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Select</b> and <b>Match</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
       /**
-       * A bit of a hack, I want the default action here to be add not delete, 
-       * so I've mirrored the add button and placed it at the begining of the form. 
+       * A bit of a hack, I want the default action here to be add not delete,
+       * so I've mirrored the add button and placed it at the begining of the form.
        * Making it hidden, so it will be the default action.
        */
       'add' => array(
@@ -593,8 +593,8 @@ function content_model_viewer_datastream_dsid_view_derived_form($form_state, $mo
       '#title' => t('Derived Datastream Display Rules (DSID)'),
       '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules compares the <b>Datastream ID\'s</b>. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Source</b> and <b>Derived</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
       /**
-       * A bit of a hack, I want the default action here to be add not delete, 
-       * so I've mirrored the add button and placed it at the begining of the form. 
+       * A bit of a hack, I want the default action here to be add not delete,
+       * so I've mirrored the add button and placed it at the begining of the form.
        * Making it hidden, so it will be the default action.
        */
       'add' => array(
@@ -612,7 +612,7 @@ function content_model_viewer_datastream_dsid_view_derived_form($form_state, $mo
 
 /**
  * Get Content Models for the Autocomplete Field.
- * 
+ *
  * @return array
  */
 function content_model_viewer_get_available_models() {
@@ -650,10 +650,10 @@ function content_model_viewer_get_available_models() {
 
 /**
  * Theme's a form table for this module.
- * 
+ *
  * @param array $element
  *   A Drupal Form Element.
- * 
+ *
  * @return sting
  *   HTML that renders a table of settings for datastreams.
  */
@@ -677,10 +677,10 @@ function theme_content_model_viewer_form_table(array $element) {
 
 /**
  * Removes the given datastream mimetype rule, identified by the #rule_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_delete_datastream_mimetype_rule(array $form, array &$form_state) {
@@ -693,10 +693,10 @@ function content_model_viewer_delete_datastream_mimetype_rule(array $form, array
 
 /**
  * Removes the given datastream id rule, identified by the #rule_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$form_state) {
@@ -709,10 +709,10 @@ function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$f
 
 /**
  * Removes the given RELS rule, identified by the #rule_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_delete_datastream_rels_view_derived_rule(array $form, array &$form_state) {
@@ -728,7 +728,7 @@ function content_model_viewer_delete_datastream_rels_view_derived_rule(array $fo
  *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_delete_datastream_dsid_view_derived_rule(array $form, array &$form_state) {
@@ -741,10 +741,10 @@ function content_model_viewer_delete_datastream_dsid_view_derived_rule(array $fo
 
 /**
  * Adds a MIME type datastream rule to a Model setting, identified by the #model_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_mimetype_rule(array $form, array &$form_state) {
@@ -760,10 +760,10 @@ function content_model_viewer_add_datastream_mimetype_rule(array $form, array &$
 
 /**
  * Adds a datastream id rule to a Model setting, identified by the #model_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_dsid_rule(array $form, array &$form_state) {
@@ -780,10 +780,10 @@ function content_model_viewer_add_datastream_dsid_rule(array $form, array &$form
 
 /**
  * Adds a rule to a Model setting, identified by the #model_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_rels_view_derived_rule(array $form, array &$form_state) {
@@ -800,10 +800,10 @@ function content_model_viewer_add_datastream_rels_view_derived_rule(array $form,
 
 /**
  * Adds a rule to a Model setting, identified by the #model_id property of the clicked button.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_dsid_view_derived_rule(array $form, array &$form_state) {
@@ -820,10 +820,10 @@ function content_model_viewer_add_datastream_dsid_view_derived_rule(array $form,
 
 /**
  * Validates the add MIME type datastream rule portion of the form.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_mime_rule_validate(array $form, array &$form_state) {
@@ -834,10 +834,10 @@ function content_model_viewer_add_datastream_mime_rule_validate(array $form, arr
 
 /**
  * Validates the add datastream id rule portion of the form.
- * 
+ *
  * @param array $form
  *   The Drupal Form.
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_dsid_rule_validate(array $form, array &$form_state) {
@@ -845,17 +845,17 @@ function content_model_viewer_add_datastream_dsid_rule_validate(array $form, arr
   if (empty($add['dsid']['#value'])) {
     form_error($add['dsid'], t('field is required.'));
   }
-  else if ($add['type']['#value'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) {
+  elseif ($add['type']['#value'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) {
     content_model_viewer_regex_validate($add['dsid'], $form_state);
   }
 }
 
 /**
  * Validates an elements input by checking if it is valid regex input.
- * 
+ *
  * @param array $element
  *   A Drupal Form Element
- * @param array $form_state 
+ * @param array $form_state
  *   The Drupal Form State.
  */
 function content_model_viewer_regex_validate(array $element, array &$form_state) {

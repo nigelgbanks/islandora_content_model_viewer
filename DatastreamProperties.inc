@@ -9,38 +9,38 @@
  */
 
 /**
- * This class is used to determine if any datastream's derived form the provided datastream, for either 
+ * This class is used to determine if any datastream's derived form the provided datastream, for either
  * viewing or downloading.
  */
 class DerivedDatastreamResolver {
 
   /**
    * The Fedora Object.
-   *  
+   *
    * @var Fedora_Item
    */
   protected $item;
 
   /**
    * The Fedora Object's Unique ID.
-   * 
+   *
    * @var string
    */
   protected $pid;
 
   /**
    * The Fedora Object's Datastream ID.
-   * 
+   *
    * @var string
    */
   protected $dsid;
 
   /**
    * Create an DerivedDatastreamResolver Instance.
-   * 
+   *
    * @param string $pid
    *   The Fedora Object's Unique ID.
-   * @param string $dsid 
+   * @param string $dsid
    *   The Datastream whose derivative we need to resolve.
    */
   public function __construct($pid, $dsid) {
@@ -52,7 +52,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Gets a Derived datastream that can be displayed to the user in the viewer panel.
-   * 
+   *
    * @return string
    *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
    */
@@ -66,7 +66,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Attempts to retrieve the derived viewable datastream from this Objects RELS-INT.
-   * 
+   *
    * @return string
    *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
    */
@@ -89,7 +89,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Gets the RELS-EXT metadata as a DOMDocment if it exists.
-   * 
+   *
    * @return DOMDocument
    *   The RELS-EXT datastream.
    */
@@ -110,7 +110,7 @@ class DerivedDatastreamResolver {
    *   This Object's RELS-INT.
    * @param string $path
    *   The XPath to the DOMNode that contains the derived Datastream ID.
-   * 
+   *
    * @return DOMNode
    *   The DOMNode that $path selects if found, otherwise FALSE.
    */
@@ -129,7 +129,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Attempts to retrieve the derived downloadable datastream from this Object.
-   * 
+   *
    * @return string
    *   The Datastream ID of a downloadable derived datastream, or NULL if none was found.
    */
@@ -139,7 +139,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Gets a RELS-INT search rule for the given datastream if it exists.
-   * 
+   *
    * @return array
    *   The row from the rels view derived rules table that governs this datastreams vieable derived datastream.
    */
@@ -151,7 +151,7 @@ class DerivedDatastreamResolver {
 
   /**
    * Gets the rules that denote what datastreams should be used as a dervied viewable type.
-   * 
+   *
    * @return array
    *   An array of the rules from the 'CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE' where
    *   the 'src_dsid' matches this datastream.
@@ -178,7 +178,7 @@ class DerivedDatastreamResolver {
   /**
    * Attempts to retrieve the derived viewable datastream from matching this Objects datastream ID's with
    * a rule.
-   * 
+   *
    * @return string
    *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
    */
@@ -208,15 +208,15 @@ class DatastreamProperties {
 
   /**
    * The object whose datastreams we will retrieve.
-   * 
+   *
    * @var Fedora_Item
    */
   protected $item;
 
   /**
    * Create a Datastreams Instance.
-   * 
-   * @param string $pid 
+   *
+   * @param string $pid
    *   The PID of the object, whose datastreams properties this class will fetch.
    */
   public function __construct($pid) {
@@ -226,15 +226,15 @@ class DatastreamProperties {
 
   /**
    * Gets the datastream properties required for showing the datastreams in the Content Model Viewer.
-   * 
+   *
    * @param int $start
    *   The offset into the datastreams of the Fedora Object.
    * @param int $length
    *   The maximum number of datastreams to return.
    * @param boolean $filter
    *   Only show those datastreams which can be shown in the Files Panel of the Overview/Viewer tabs.
-   * 
-   * @return array 
+   *
+   * @return array
    *   The data needed to show the datastream properties.
    */
   public function get($start, $length, $filter = FALSE) {
@@ -282,9 +282,9 @@ class DatastreamProperties {
 
   /**
    * Gets the properties for one datastream
-   * 
-   * @param string $dsid 
-   * 
+   *
+   * @param string $dsid
+   *
    * @return array
    */
   public function setProperties($dsid, $properties) {
@@ -322,11 +322,11 @@ class DatastreamProperties {
 
   /**
    * Filters the data streams down to a list of data streams which can be either viewed, or downloaded.
-   * 
+   *
    * @param array $datastreams
    *   All the data streams that belong to the Fedora Object.
-   * 
-   * @return array 
+   *
+   * @return array
    *   The datastreams which can be viewed or downloaded.
    */
   private function filter(array &$datastreams) {
@@ -343,12 +343,12 @@ class DatastreamProperties {
 
   /**
    * Gets the Download and View permission for the given data stream.
-   * 
+   *
    * @param string $dsid
    *   The data stream whose permissions this function fetches.
-   * @param string $mime 
+   * @param string $mime
    *   The MIME type of the data stream.
-   * 
+   *
    * @return array
    *   An array containing two boolean values, the first is the view permission the second is the download permission.
    *    array((bool)$view, (bool)$download)
@@ -382,9 +382,9 @@ class DatastreamProperties {
 
   /**
    * Determines if a viewer plugin is installed for the given mime type.
-   * 
-   * @param string $mime 
-   * 
+   *
+   * @param string $mime
+   *
    * @return boolean
    *   TRUE if a viewer exists that can handle the given MIME type, FALSE otherwise.
    */
@@ -394,8 +394,8 @@ class DatastreamProperties {
 
   /**
    * Checks if this datastream should be displayed by default in the viewer panel.
-   * 
-   * @param string $dsid 
+   *
+   * @param string $dsid
    *   The datastream in question.
    * @return boolean
    *   TRUE if it should be displayed FALSE otherwise.
@@ -408,14 +408,14 @@ class DatastreamProperties {
 
   /**
    * Some datastreams are not viewable such as PDF's but they have derived types like SWF's which can be viewed.
-   * 
+   *
    * For now the Default Action is to return the same data
-   * 
+   *
    * @param string $dsid
    *   The Datastream to view.
-   * @param string $mime 
+   * @param string $mime
    *   The Mime type of the datastream to view.
-   * 
+   *
    * @return string
    *   The function to call to initialize the viewer, NULL if none is required.
    */
@@ -430,8 +430,8 @@ class DatastreamProperties {
   /**
    * Checks if the given datastream can be edited, at the moment only xml metadata can be edited.
    *
-   * @param string $dsid 
-   *   The datastream ID of the datastream in question. 
+   * @param string $dsid
+   *   The datastream ID of the datastream in question.
    * @return boolean
    *   Returns TRUE if it the datastream can be edited, FALSE otherwise.
    */
@@ -447,15 +447,15 @@ class DatastreamProperties {
   }
 
   /**
-   * Get's a javascript function to call to initialize the viewer. 
-   * 
+   * Get's a javascript function to call to initialize the viewer.
+   *
    * Some viewers will not require initialization, in which case this function will return NULL.
-   * 
+   *
    * @param string $dsid
    *   The Datastream to view.
-   * @param string $mime 
+   * @param string $mime
    *   The Mime type of the datastream to view.
-   * 
+   *
    * @return string
    *   The function to call to initialize the viewer, NULL if none is required.
    */
@@ -473,14 +473,14 @@ class DatastreamProperties {
   /**
    * Some datastreams are restricted for downloading, and a lower quality version may be allowed. In these cases the
    * lower quality datastream will be provided for downloaded.
-   * 
+   *
    * At the moment this isn't parametrized so it will return the same $dsid it has been given.
-   * 
+   *
    * @param string $dsid
    *   The Datastream to download.
-   * @param string $mime 
+   * @param string $mime
    *   The Mime type of the datastream to download.
-   * 
+   *
    * @return string
    *   The datastream to download.
    */
@@ -490,15 +490,15 @@ class DatastreamProperties {
 
   /**
    * Gets the url to the image that will be used as a thumbnail for this object.
-   * 
-   * If there are no derived thumbnails for this datastream a image indicating the MIME type of the datastream 
+   *
+   * If there are no derived thumbnails for this datastream a image indicating the MIME type of the datastream
    * will be used, if there is no image associated with the MIME type of the datastream, a default image will be used.
-   * 
-   * @param string $dsid 
+   *
+   * @param string $dsid
    *   The datastream ID.
    * @param string $mime
    *   The mime type for the given datastream.
-   * 
+   *
    * @return string
    *   A URL to the image that will be used as a thumbnail for the datastream.
    */
@@ -514,7 +514,7 @@ class DatastreamProperties {
 
   /**
    * Searches the RELS-INT for a thumbnail relation.
-   * 
+   *
    * @param string $dsid
    *   The datastream ID.
    * @return string
@@ -544,7 +544,7 @@ class DatastreamProperties {
 
   /**
    * Gets the url from this datastreams dsid, if it exists.
-   * 
+   *
    * @global string $base_url
    * @return string
    */
@@ -596,7 +596,7 @@ class DatastreamProperties {
 
   /**
    * Gets the Default icon to use when all else fails.
-   * 
+   *
    * @return string
    *   A URL to the default image.
    */
