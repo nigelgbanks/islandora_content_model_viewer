@@ -124,6 +124,9 @@ function content_model_viewer_get_model_id($pid) {
   $model_id = db_result(db_query('SELECT id FROM {%s} WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $pid));
   if (!$model_id) {
     $object = islandora_object_load($pid);
+    if (!$object) {
+      return : CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
+    }
     foreach ($object->models as $model) {
       $model_id = db_result(db_query('SELECT id FROM {%s} WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model));
       if ($model_id) {
