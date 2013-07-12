@@ -578,9 +578,9 @@ ContentModelViewer.setup.createStores = function () {
   /**
    * Tree Store
    */
-  if (properties.root === properties.siUser) {
+  if (ContentModelViewer.properties.root === ContentModelViewer.properties.siUser) {
     icon = 'peopleCModel';
-    rootowner = properties.rootowner;
+    rootowner = ContentModelViewer.properties.rootowner;
   }
   Ext.create('Ext.data.TreeStore', {
     storeId: 'treemembers',
@@ -594,7 +594,7 @@ ContentModelViewer.setup.createStores = function () {
       text: rootowner,
       iconCls: icon,
       expanded: true,
-      pid: properties.root
+      pid: ContentModelViewer.properties.root
     }
   });
 };
