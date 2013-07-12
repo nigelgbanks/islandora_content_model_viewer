@@ -135,7 +135,8 @@ class Collection {
       $object <fedora-model:createdDate> $created and
       $object <fedora-model:hasModel> $model
       minus $model <mulgara:is> <info:fedora/si:conceptCModel>
-      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>';
+      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      order by $title';
     $results = $this->query($query);
     $results = $this->populate($results);
     return $results;
